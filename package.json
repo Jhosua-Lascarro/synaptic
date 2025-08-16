@@ -1,0 +1,34 @@
+{
+  "name": "synaptic",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Modern webapp with Vite y TailwindCSS.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jhosua-Lascarro/SynapTic"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "format": "biome format .",
+    "lint": "biome lint .",
+    "check": "biome check .",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.0.6",
+    "concurrently": "^9.2.0",
+    "vite": "^7.1.2",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.12",
+    "tailwindcss": "^4.1.12"
+  }
+}
