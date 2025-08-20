@@ -1,5 +1,5 @@
 
-const userURL = "http://localhost:3000/register";
+const userURL = "http://localhost:3000";
 
 export function register() {
   const form = document.getElementById("registerForm");
@@ -20,7 +20,7 @@ export function register() {
 
 
     try {
-      const resp = await axios.post(userURL, {
+      const resp = await axios.post(`${userURL}/auth/register`, {
         username,
         email,
         password,
@@ -39,5 +39,3 @@ export function register() {
     }
   });
 }
-
-register()

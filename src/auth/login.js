@@ -1,4 +1,4 @@
-const userURL = "http://localhost:3000/register";
+const userURL = "http://localhost:3000";
 
 async function login({ email, password }) {
   const form = document.getElementById("loginForm");
@@ -13,7 +13,7 @@ async function login({ email, password }) {
       password: password,
     };
     try {
-      const resp = await axios.get(userURL, {
+      const resp = await axios.get(`${userURL}/auth/login`, {
         params: { email, password },
       });
       const users = resp.data;
@@ -32,10 +32,13 @@ async function login({ email, password }) {
       console.log(error);
       alert("ocurrió un error inesperado");
     }
-    const login_ = login(params);
-    if (login_) {
-     alert("estoy adentro")
-    }
+    if (login) {
+      location.href = "/";
+      }
+    // const login_ = login(params);
+    // if (login_) {
+    //   alert("estoy adentro");
+    // }
   });
 }
-login({ email, password });
+
