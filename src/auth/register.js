@@ -8,23 +8,17 @@ export function register() {
     e.preventDefault();
 
     const username = document.getElementById("username").value;
-    const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     const repeatPassword =document.getElementById("repeat_password").value;
 
-
     if (password!==repeatPassword) {
-        return alert("no coninciden")
-        
+        return alert("the password not match")
     }
-
 
     try {
       const resp = await axios.post(`${userURL}/auth/register`, {
         username,
-        email,
-        password,
-        role:2,
+        password
       });
 
       const newUser = resp.data;
