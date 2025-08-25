@@ -17,6 +17,29 @@ app.get("/", async (_req, res) => {
   return res.json(data);
 });
 
+app.post("/doctor", async (req, res) => {
+  const { user_id, years_expirence } = req.body;
+  const { data: users, error: errorUsers } = await supabase
+    .from("users")
+    .select("id")
+    .eq("id", user_id)
+    .single();
+
+  if (errorUsers || !users) {
+    return res.status(404).json({ error: "usuario no encontrado" });
+  }
+
+  const { data, error } = await supabase
+    .from("doctors")
+    .insert([{ user_id, years_expirence }])
+    .select();
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+  return res.status(201).json(data);
+});
+
 app.post("/", async (req, res) => {
   const {
     fullname,
