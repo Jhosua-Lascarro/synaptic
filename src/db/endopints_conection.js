@@ -1,5 +1,5 @@
-import express from "express";
 import cors from "cors";
+import express from "express";
 import { supabase } from "./conection_db.js";
 
 const app = express();
@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.get("/", async (req, res) => {
+app.get("/", async (_req, res) => {
   const { data, error } = await supabase.from("users").select("*");
 
   if (error) {
@@ -83,13 +83,32 @@ app.put("/:id", async (req, res) => {
   if (error) {
     return res.status(500).json({ error: error.message });
   }
-  console.log(data)
+  console.log(data);
   return res.json(data);
+});
+
+app.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { data, error } = await supabase
+    .from("users")
+    .delete()
+    .eq("id", id)
+    .select();
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+
+  if (!data || data.length === 0) {
+    return res.status(404).json({ message: "usuario no encontrado" });
+  }
+
+  return res.json({ message: "usuario eliminado", data });
 });
 
 app.listen(3000, (error) => {
   if (error) {
     console.error("error en el servidor", error.message);
   }
-  console.log(`servidor arriba en puerto http://localhost:3000`);
+  console.log("servidor arriba en puerto http://localhost:3000");
 });
