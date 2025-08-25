@@ -1,7 +1,7 @@
 {
   "name": "synaptic",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Modern webapp with Vite y TailwindCSS.",
   "license": "MIT",
   "repository": {
@@ -28,7 +28,11 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.56.0",
     "@tailwindcss/vite": "^4.1.12",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
     "tailwindcss": "^4.1.12"
   }
 }

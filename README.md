@@ -8,3 +8,5 @@ Modern webapp with Vite and TailwindCSS.
 - TailwindCSS
 - Biome
 - Vitest
+- Express
+- Supbase
