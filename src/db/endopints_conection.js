@@ -4,6 +4,7 @@ import { supabase } from "./conection_db.js";
 
 
 
+
 const app=express()
 
 app.use(express.json())
@@ -26,7 +27,14 @@ app.get("/", async (req, res) => {
 
 app.post("/",async (req,res) => {
   const {fullname,email,identification,role,password_hash,birthdate,phone,sexo} =req.body
-  
+  const {data,error} = await supabase.from('users').insert([{fullname,email,identification,role,password_hash,birthdate,phone,sexo   }]).select();
+  if (error) {
+    return res.status(500).json({error:error.message})
+  }
+
+  console.log(data)
+
+  return res.status(201).json(data);
 })
 
 
