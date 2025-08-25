@@ -2,18 +2,13 @@ import express from "express";
 import cors from "cors";
 import { supabase } from "./conection_db.js";
 
+const app = express();
 
-
-
-const app=express()
-
-app.use(express.json())
-app.use(cors())
+app.use(express.json());
+app.use(cors());
 
 app.get("/", async (req, res) => {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*');
+  const { data, error } = await supabase.from("users").select("*");
 
   if (error) {
     return res.status(500).json({ error: error.message });
@@ -22,31 +17,79 @@ app.get("/", async (req, res) => {
   return res.json(data);
 });
 
-
-
-
-app.post("/",async (req,res) => {
-  const {fullname,email,identification,role,password_hash,birthdate,phone,sexo} =req.body
-  const {data,error} = await supabase.from('users').insert([{fullname,email,identification,role,password_hash,birthdate,phone,sexo   }]).select();
+app.post("/", async (req, res) => {
+  const {
+    fullname,
+    email,
+    identification,
+    role,
+    password_hash,
+    birthdate,
+    phone,
+    sexo,
+  } = req.body;
+  const { data, error } = await supabase
+    .from("users")
+    .insert([
+      {
+        fullname,
+        email,
+        identification,
+        role,
+        password_hash,
+        birthdate,
+        phone,
+        sexo,
+      },
+    ])
+    .select();
   if (error) {
-    return res.status(500).json({error:error.message})
+    return res.status(500).json({ error: error.message });
   }
 
-  console.log(data)
+  console.log(data);
 
   return res.status(201).json(data);
-})
+});
 
+app.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  const {
+    fullname,
+    email,
+    identification,
+    role,
+    password_hash,
+    birthdate,
+    phone,
+    sexo,
+  } = req.body;
+  const inputUpdate = {};
+  if (fullname) inputUpdate.fullname = fullname;
+  if (email) inputUpdate.email = email;
+  if (identification) inputUpdate.identification = identification;
+  if (role) inputUpdate.role = role;
+  if (password_hash) inputUpdate.password_hash = password_hash;
+  if (birthdate) inputUpdate.birthdate = birthdate;
+  if (phone) inputUpdate.phone = phone;
+  if (sexo) inputUpdate.sexo = sexo;
+
+  const { data, error } = await supabase
+    .from("users")
+    .update(inputUpdate)
+    .eq("id", id)
+    .select();
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+  console.log(data)
+  return res.json(data);
+});
 
 app.listen(3000, (error) => {
   if (error) {
-     console.error("error en el servidor",error.message)
-    
+    console.error("error en el servidor", error.message);
   }
-  console.log(`servidor arriba en puerto http://localhost:3000`)
- 
-  
-})
-
-
-
+  console.log(`servidor arriba en puerto http://localhost:3000`);
+});
