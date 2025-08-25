@@ -1,35 +1,35 @@
-import { login } from "./login.js";
-import { register } from "./register.js";
-// routes de acces
+
+
 const routes = {
-  // "/": "/src/views/home.html",
-  "/login": "/src/views/login.html",
-  "/register": "/src/views/register.html",
-  "/notFound": "/src/views/404.html",
+  "/": {
+    path: "/src/views/login.html",
+   
+  },
+  "/register": {
+    path: "/src/views/register.html",
+  },
+  "/dashboard": {
+    path: "/src/views/dashboard.html",
+  },
 };
 
-export async function renderRoute() {
-  const currentUser = JSON.parse(localStorage.getItem("user"));
-  const path = location.pathname;
+export async function renderRouter() {
   const app = document.getElementById("app");
-  const isAuth = localStorage.getItem("isAuth");
+  const path = window.location.pathname;
+  const route = routes[path] || routes["/notfound"];
 
-  const file = routes[path];
-  if (!file) {
-    location.href = "/notFound";
-    return;
-  }
+  try {
+    const file = await fetch(route.path);
+    const content = await file.text();
+    app.innerHTML = content;
 
-  if (isAuth && path === "/login") {
-    location.pathname = "/";
-    return;
+    
+  } catch (error) {
+    console.log("no se encontro la ruta ", error);
   }
-  // Here I call the function register
-    if (path === "/register") {
-    register();
-    }
-  // Here I call the function login
-    if (path === "/login") {
-    login({ email, password });
-    }
+}
+
+export function redirecto(path) {
+  window.history.replaceState({}, "", `${path}`);
+  return renderRouter();
 }

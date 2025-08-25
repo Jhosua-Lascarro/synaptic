@@ -1,6 +1,6 @@
 const userURL = "http://localhost:3000";
 
-async function login({ email, password }) {
+ export async function login({ email, password }) {
   const form = document.getElementById("loginForm");
 
   form.addEventListener("submit", async (e) => {
