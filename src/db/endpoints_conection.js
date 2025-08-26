@@ -152,12 +152,42 @@ app.post("/patiens", async (req, res) => {
   return res.status(201).json(data);
 });
 
+app.get("/appointments", async (_req, res) => {
+  const { data, error } = await supabase.from("/appointments").select("*");
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+
+  return res.json(data);
+});
+
+app.get("/appointments/patient/:id", async (req, res) => {
+  const { id } = req.params;
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .select("*")
+    .eq("patient_id", id);
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+
+  if (!data || data.length === 0) {
+    return res.status(404).json({ error: "No se encontraron citas para este paciente" });
+  }
+
+  return res.json(data);
+});
+
 app.post("/appointments", async (req, res) => {
-  const { patient_id, doctor_id, appointment_date, status_id, reason, notes } = req.body;
+  const { patient_id, doctor_id, appointment_date, status_id, reason, notes } =
+    req.body;
   const { data: patients, error: errorpatients } = await supabase
     .from("patiens")
     .select("id")
-    .eq("id", patient_id) 
+    .eq("id", patient_id)
     .single();
 
   if (errorpatients || !patients) {
@@ -166,7 +196,9 @@ app.post("/appointments", async (req, res) => {
 
   const { data, error } = await supabase
     .from("appointments")
-    .insert([{ patient_id, doctor_id, appointment_date, status_id, reason, notes}])
+    .insert([
+      { patient_id, doctor_id, appointment_date, status_id, reason, notes },
+    ])
     .select();
 
   if (error) {
@@ -176,12 +208,12 @@ app.post("/appointments", async (req, res) => {
 });
 
 app.patch("/appointments/:id", async (req, res) => {
-  const {id} =req.params
+  const { id } = req.params;
   const { reason } = req.body;
   const { data: patients, error: errorpatients } = await supabase
     .from("appointments")
     .select("id")
-    .eq("id", id) 
+    .eq("id", id)
     .single();
 
   if (errorpatients || !patients) {
@@ -190,8 +222,8 @@ app.patch("/appointments/:id", async (req, res) => {
 
   const { data, error } = await supabase
     .from("appointments")
-    .update({ reason})
-    .eq("id",id)
+    .update({ reason })
+    .eq("id", id)
     .select();
 
   if (error) {
