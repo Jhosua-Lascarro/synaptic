@@ -17,29 +17,6 @@ app.get("/", async (_req, res) => {
   return res.json(data);
 });
 
-app.post("/doctor", async (req, res) => {
-  const { user_id, years_expirence } = req.body;
-  const { data: users, error: errorUsers } = await supabase
-    .from("users")
-    .select("id")
-    .eq("id", user_id)
-    .single();
-
-  if (errorUsers || !users) {
-    return res.status(404).json({ error: "usuario no encontrado" });
-  }
-
-  const { data, error } = await supabase
-    .from("doctors")
-    .insert([{ user_id, years_expirence }])
-    .select();
-
-  if (error) {
-    return res.status(500).json({ error: error.message });
-  }
-  return res.status(201).json(data);
-});
-
 app.post("/", async (req, res) => {
   const {
     fullname,
@@ -127,6 +104,100 @@ app.delete("/:id", async (req, res) => {
   }
 
   return res.json({ message: "usuario eliminado", data });
+});
+
+app.post("/doctor", async (req, res) => {
+  const { user_id, years_expirence } = req.body;
+  const { data: users, error: errorUsers } = await supabase
+    .from("users")
+    .select("id")
+    .eq("id", user_id)
+    .single();
+
+  if (errorUsers || !users) {
+    return res.status(404).json({ error: "usuario no encontrado" });
+  }
+
+  const { data, error } = await supabase
+    .from("doctors")
+    .insert([{ user_id, years_expirence }])
+    .select();
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+  return res.status(201).json(data);
+});
+
+app.post("/patiens", async (req, res) => {
+  const { user_id } = req.body;
+  const { data: users, error: errorUsers } = await supabase
+    .from("users")
+    .select("id")
+    .eq("id", user_id)
+    .single();
+
+  if (errorUsers || !users) {
+    return res.status(404).json({ error: "paciente no encontrado" });
+  }
+
+  const { data, error } = await supabase
+    .from("patiens")
+    .insert([{ user_id }])
+    .select();
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+  return res.status(201).json(data);
+});
+
+app.post("/appointments", async (req, res) => {
+  const { patient_id, doctor_id, appointment_date, status_id, reason, notes } = req.body;
+  const { data: patients, error: errorpatients } = await supabase
+    .from("patiens")
+    .select("id")
+    .eq("id", patient_id) 
+    .single();
+
+  if (errorpatients || !patients) {
+    return res.status(404).json({ error: "paciente no encontrado" });
+  }
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .insert([{ patient_id, doctor_id, appointment_date, status_id, reason, notes}])
+    .select();
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+  return res.status(201).json(data);
+});
+
+app.patch("/appointments/:id", async (req, res) => {
+  const {id} =req.params
+  const { reason } = req.body;
+  const { data: patients, error: errorpatients } = await supabase
+    .from("appointments")
+    .select("id")
+    .eq("id", id) 
+    .single();
+
+  if (errorpatients || !patients) {
+    return res.status(404).json({ error: "cita no encontrado" });
+  }
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .update({ reason})
+    .eq("id",id)
+    .select();
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+  return res.status(201).json(data);
 });
 
 app.listen(3000, (error) => {
