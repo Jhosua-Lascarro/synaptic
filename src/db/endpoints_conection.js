@@ -106,7 +106,7 @@ app.delete("/:id", async (req, res) => {
   return res.json({ message: "usuario eliminado", data });
 });
 
-app.post("/doctor", async (req, res) => {
+app.post("/doctors", async (req, res) => {
   const { user_id, years_expirence } = req.body;
   const { data: users, error: errorUsers } = await supabase
     .from("users")
@@ -198,6 +198,25 @@ app.patch("/appointments/:id", async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
   return res.status(201).json(data);
+});
+
+app.delete("/appointments/:id", async (req, res) => {
+  const { id } = req.params;
+  const { data, error } = await supabase
+    .from("appointments")
+    .delete()
+    .eq("id", id)
+    .select();
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+
+  if (!data || data.length === 0) {
+    return res.status(404).json({ message: "Cita no encontrada" });
+  }
+
+  return res.json({ message: "usuario eliminado", data });
 });
 
 app.listen(3000, (error) => {
