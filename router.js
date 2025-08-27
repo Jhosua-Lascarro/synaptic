@@ -2,14 +2,20 @@
 
 const routes = {
   "/": {
-    path: "/src/views/login.html",
+    path: "/views/login.html",
    
   },
   "/register": {
-    path: "/src/views/register.html",
+    path: "/views/register.html",
   },
   "/dashboard": {
-    path: "/src/views/dashboard.html",
+    path: "/views/dashboard.html",
+  },
+  "/dashboardDoctor": {
+    path: "/views/dashboardDoctor.html",
+  },
+  "/notfound": {
+    path: "/views/404.html",
   },
 };
 
@@ -33,3 +39,4 @@ export function redirecto(path) {
   window.history.replaceState({}, "", `${path}`);
   return renderRouter();
 }
+
