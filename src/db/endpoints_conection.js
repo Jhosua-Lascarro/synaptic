@@ -31,21 +31,19 @@ app.post("/", async (req, res) => {
     sexo,
   } = req.body;
 
-  const {data:existingUser,error:errorEmail} = await  supabase
-  .from('users')
-   .select('email')
-  .eq('email',emailInput)
- 
+  const { data: existingUser, error: errorEmail } = await supabase
+    .from("users")
+    .select("email")
+    .eq("email", emailInput);
 
   if (errorEmail) {
-    return res.status(500).json({ message:"error al verificar correo"  });
+    return res.status(500).json({ message: "error al verificar correo" });
   }
-  if (existingUser.length!==0) {
-    return res.status(400).json({  message:"el usuario ya esta registrado"  });
+  if (existingUser.length !== 0) {
+    return res.status(400).json({ message: "el usuario ya esta registrado" });
   }
 
-
-  const hashPassword = await bcrypt.hash(password_hash,10);
+  const hashPassword = await bcrypt.hash(password_hash, 10);
   const { data, error } = await supabase
     .from("users")
     .insert([
@@ -54,7 +52,7 @@ app.post("/", async (req, res) => {
         email: emailInput,
         identification,
         role,
-        password_hash:hashPassword,
+        password_hash: hashPassword,
         birthdate,
         phone,
         sexo,
@@ -62,15 +60,13 @@ app.post("/", async (req, res) => {
     ])
     .select();
 
-
-
   if (error) {
     return res.status(500).json({ error: error.message });
   }
 
   console.log(data);
 
-  return res.status(201).json({message:"Registro exitoso"});
+  return res.status(201).json({ message: "Registro exitoso" });
 });
 
 app.put("/:id", async (req, res) => {
@@ -154,7 +150,7 @@ app.post("/patiens", async (req, res) => {
   const { user_id } = req.body;
   const { data: users, error: errorUsers } = await supabase
     .from("users")
-    
+
     .eq("id", user_id)
     .single();
 
@@ -196,7 +192,9 @@ app.get("/appointments/patient/:id", async (req, res) => {
   }
 
   if (!data || data.length === 0) {
-    return res.status(404).json({ error: "No se encontraron citas para este paciente" });
+    return res
+      .status(404)
+      .json({ error: "No se encontraron citas para este paciente" });
   }
 
   return res.json(data);
@@ -255,7 +253,7 @@ app.patch("/appointments/:id", async (req, res) => {
 
 /*este es el login d la autenticacion para abrir el dashboard */
 
-  app.post("/login", async (req, res) => {
+app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   // Buscar usuario
@@ -269,16 +267,13 @@ app.patch("/appointments/:id", async (req, res) => {
     return res.status(401).json({ error: "Usuario no encontrado" });
   }
 
-  // Validar contraseña (esto es plano, lo ideal es bcrypt)
-  if (users.password_hash !== password) {
-    return res.status(401).json({ error: "Contraseña incorrecta" });
+  const match = await bcrypt.compare(password, users.password_hash);
+
+  if (!match) {
+    return res.status(401).json({ error: "Usuario o contraseña inválidos" });
   }
-
-  
-
   res.json({ message: "Login correcto", users });
-  })
-
+});
 
 /* buscar todas las citas de un paciente */
 
@@ -287,11 +282,13 @@ app.get("/patients/appointments/:id", async (req, res) => {
 
   const { data: patient, error: patientError } = await supabase
     .from("patiens")
-    .select(`
+    .select(
+      `
       id,
       user:users(id,fullname, email,role),
       appointments(id, appointment_date, reason)
-    `)
+    `
+    )
     .eq("id", id);
 
   if (patientError) {
@@ -304,7 +301,6 @@ app.get("/patients/appointments/:id", async (req, res) => {
 
   res.json(patient[0]);
 });
-
 
 app.listen(3000, (error) => {
   if (error) {
