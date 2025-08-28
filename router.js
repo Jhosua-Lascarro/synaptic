@@ -1,15 +1,14 @@
+import { setupLogin } from "@/js/setupLogin";
 import { setupRegister } from "@/js/setupRegister";
-
 
 const routes = {
   "/": {
     path: "/views/login.html",
-    
-   
+    setup: setupLogin,
   },
   "/register": {
     path: "/views/register.html",
-    setup:setupRegister
+    setup: setupRegister,
   },
   "/dashboard": {
     path: "/views/dashboard.html",
@@ -32,22 +31,15 @@ export async function renderRouter() {
     const content = await file.text();
     app.innerHTML = content;
 
-
     if (route.setup) {
-  route.setup()
-  
-}
-
-    
+      route.setup();
+    }
   } catch (error) {
     console.log("no se encontro la ruta ", error);
   }
 }
 
-
-
 export function redirecto(path) {
   window.history.replaceState({}, "", `${path}`);
   return renderRouter();
 }
-
