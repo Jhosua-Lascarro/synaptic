@@ -231,15 +231,16 @@ app.patch("/appointments/:id", async (req, res) => {
   }
   return res.status(201).json(data);
 });
+/* buscar todas las citas de un paciente */
 
-app.get("/patients/:id", async (req, res) => {
+app.get("/patients/appointments/:id", async (req, res) => {
   const id = req.params.id;
 
   const { data: patient, error: patientError } = await supabase
     .from("patiens")
     .select(`
       id,
-      user:users(fullname, email),
+      user:users(id,fullname, email,role),
       appointments(id, appointment_date, reason)
     `)
     .eq("id", id);
