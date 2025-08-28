@@ -231,6 +231,34 @@ app.patch("/appointments/:id", async (req, res) => {
   }
   return res.status(201).json(data);
 });
+
+/*este es el login d la autenticacion para abrir el dashboard */
+
+  app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  // Buscar usuario
+  const { data: users, error } = await supabase
+    .from("users")
+    .select("id, email, password_hash, role")
+    .eq("email", email)
+    .single();
+
+  if (error || !users) {
+    return res.status(401).json({ error: "Usuario no encontrado" });
+  }
+
+  // Validar contraseña (esto es plano, lo ideal es bcrypt)
+  if (users.password_hash !== password) {
+    return res.status(401).json({ error: "Contraseña incorrecta" });
+  }
+
+  
+
+  res.json({ message: "Login correcto", users });
+  })
+
+
 /* buscar todas las citas de un paciente */
 
 app.get("/patients/appointments/:id", async (req, res) => {
