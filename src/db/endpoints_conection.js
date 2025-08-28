@@ -1,5 +1,7 @@
-import cors from "cors";
 import express from "express";
+import cors from "cors";
+import bcrypt from "bcrypt";
+
 import { supabase } from "./conection_db.js";
 
 const app = express();
@@ -20,7 +22,7 @@ app.get("/", async (_req, res) => {
 app.post("/", async (req, res) => {
   const {
     fullname,
-    email,
+    emailInput,
     identification,
     role,
     password_hash,
@@ -28,21 +30,40 @@ app.post("/", async (req, res) => {
     phone,
     sexo,
   } = req.body;
+
+  const {data:existingUser,error:errorEmail} = await  supabase
+  .from('users')
+   .select('email')
+  .eq('email',emailInput)
+ 
+
+  if (errorEmail) {
+    return res.status(500).json({ message:"error al verificar correo"  });
+  }
+  if (existingUser.length!==0) {
+    return res.status(400).json({  message:"el usuario ya esta registrado"  });
+  }
+
+
+  const hashPassword = await bcrypt.hash(password_hash,10);
   const { data, error } = await supabase
     .from("users")
     .insert([
       {
         fullname,
-        email,
+        email: emailInput,
         identification,
         role,
-        password_hash,
+        password_hash:hashPassword,
         birthdate,
         phone,
         sexo,
       },
     ])
     .select();
+
+
+
   if (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -133,7 +154,7 @@ app.post("/patiens", async (req, res) => {
   const { user_id } = req.body;
   const { data: users, error: errorUsers } = await supabase
     .from("users")
-    .select("id")
+    
     .eq("id", user_id)
     .single();
 
