@@ -302,6 +302,40 @@ app.get("/patients/appointments/:id", async (req, res) => {
   res.json(patient[0]);
 });
 
+app.get("/appointments/fecha", async (req, res) => {
+  const { date } = req.query; // YYYY-MM-DD
+
+  if (!date) {
+    return res.status(400).json({ error: "Debe enviar la fecha en query ?date=YYYY-MM-DD" });
+  }
+
+  // Definimos el rango de ese día
+  const startDate = `${date}T00:00:00`;
+  const endDate   = `${date}T23:59:59`;
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .select(`
+      id,
+      reason,
+      appointment_date,
+      patiens (
+        id,
+        users (
+          fullname,
+          birthdate
+        )
+      )
+    `)
+    .gte("appointment_date", startDate) // mayor o igual al inicio del día
+    .lte("appointment_date", endDate); // menor o igual al final del día
+
+  if (error) return res.status(500).json({ error: error.message });
+
+  res.json(data);
+});
+
+
 app.listen(3000, (error) => {
   if (error) {
     console.error("error en el servidor", error.message);
