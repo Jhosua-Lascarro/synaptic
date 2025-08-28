@@ -232,24 +232,29 @@ app.patch("/appointments/:id", async (req, res) => {
   return res.status(201).json(data);
 });
 
-app.delete("/appointments/:id", async (req, res) => {
-  const { id } = req.params;
-  const { data, error } = await supabase
-    .from("appointments")
-    .delete()
-    .eq("id", id)
-    .select();
+app.get("/patients/:id", async (req, res) => {
+  const id = req.params.id;
 
-  if (error) {
-    return res.status(500).json({ error: error.message });
+  const { data: patient, error: patientError } = await supabase
+    .from("patiens")
+    .select(`
+      id,
+      user:users(fullname, email),
+      appointments(id, appointment_date, reason)
+    `)
+    .eq("id", id);
+
+  if (patientError) {
+    return res.status(400).json({ error: patientError.message });
   }
 
-  if (!data || data.length === 0) {
-    return res.status(404).json({ message: "Cita no encontrada" });
+  if (!patient || patient.length === 0) {
+    return res.status(404).json({ error: "Patient not found" });
   }
 
-  return res.json({ message: "usuario eliminado", data });
+  res.json(patient[0]);
 });
+
 
 app.listen(3000, (error) => {
   if (error) {
