@@ -49,7 +49,7 @@ app.post("/", async (req, res) => {
 
   console.log(data);
 
-  return res.status(201).json(data);
+  return res.status(201).json({message:"Registro exitoso"});
 });
 
 app.put("/:id", async (req, res) => {

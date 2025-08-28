@@ -1,120 +1,172 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro - Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center">
-    <div class="max-w-md w-full space-y-8 p-8">
-        <div class="text-center">
-            <h2 class="text-3xl font-bold text-gray-900 mb-2">Crear Cuenta</h2>
-            <p class="text-gray-600">Regístrate para acceder al dashboard</p>
+
+<body class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8">
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-blue-600 mb-2">Crear Cuenta</h1>
+            <p class="text-gray-600">Completa todos los campos para registrarte</p>
         </div>
-        
-        <div class="bg-white rounded-lg shadow-md p-8">
-            <form class="space-y-6">
-                <div>
-                    <label for="fullName" class="block text-sm font-medium text-gray-700 mb-2">
-                        Nombre Completo
-                    </label>
-                    <input 
-                        type="text" 
-                        id="fullName" 
-                        name="fullName"
-                        required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Ingresa tu nombre completo"
-                    >
-                </div>
-                
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                        Email
-                    </label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        name="email"
-                        required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="tu@email.com"
-                    >
-                </div>
-                
-                <div>
-                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
-                        Teléfono
-                    </label>
-                    <input 
-                        type="tel" 
-                        id="phone" 
-                        name="phone"
-                        required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="+1 (555) 123-4567"
-                    >
-                </div>
-                
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
-                        Contraseña
-                    </label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password"
-                        required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Mínimo 8 caracteres"
-                    >
-                </div>
-                
-                <div>
-                    <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
-                        Confirmar Contraseña
-                    </label>
-                    <input 
-                        type="password" 
-                        id="confirmPassword" 
-                        name="confirmPassword"
-                        required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Repite tu contraseña"
-                    >
-                </div>
-                
-                <div class="flex items-center">
-                    <input 
-                        type="checkbox" 
-                        id="terms" 
-                        name="terms"
-                        required
-                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    >
-                    <label for="terms" class="ml-2 block text-sm text-gray-700">
-                        Acepto los <a href="#" class="text-blue-600 hover:text-blue-500">términos y condiciones</a>
-                    </label>
-                </div>
-                
-                <button 
-                    type="submit"
-                    class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
+
+        <form class="space-y-6">
+            <!-- Nombre Completo -->
+            <div>
+                <label for="fullname" class="block text-sm font-medium text-gray-700 mb-2">
+                    Nombre Completo
+                </label>
+                <input 
+                    type="text" 
+                    id="fullname" 
+                    name="fullname" 
+                    required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    placeholder="Ingresa tu nombre completo"
                 >
-                    Crear Cuenta
-                </button>
-            </form>
-            
-            <div class="mt-6 text-center">
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                    Correo Electrónico
+                </label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    placeholder="ejemplo@correo.com"
+                >
+            </div>
+
+            <!-- Identificación -->
+            <div>
+                <label for="identification" class="block text-sm font-medium text-gray-700 mb-2">
+                    Número de Identificación
+                </label>
+                <input 
+                    type="text" 
+                    id="identification" 
+                    name="identification" 
+                    required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    placeholder="Ingresa tu número de identificación"
+                >
+            </div>
+
+            <!-- Teléfono -->
+            <div>
+                <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
+                    Teléfono
+                </label>
+                <input 
+                    type="tel" 
+                    id="phone" 
+                    name="phone" 
+                    required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    placeholder="+57 300 123 4567"
+                >
+            </div>
+
+            <!-- Fecha de Nacimiento -->
+            <div>
+                <label for="birthdate" class="block text-sm font-medium text-gray-700 mb-2">
+                    Fecha de Nacimiento
+                </label>
+                <input 
+                    type="date" 
+                    id="birthdate" 
+                    name="birthdate" 
+                    required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                >
+            </div>
+
+            <!-- Sexo -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Sexo
+                </label>
+                <div class="flex gap-4">
+                    <label class="flex items-center">
+                        <input 
+                            type="radio" 
+                            name="gender" 
+                            value="masculino" 
+                            required
+                            class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                        >
+                        <span class="ml-2 text-sm text-gray-700">Masculino</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input 
+                            type="radio" 
+                            name="gender" 
+                            value="femenino" 
+                            required
+                            class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                        >
+                        <span class="ml-2 text-sm text-gray-700">Femenino</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input 
+                            type="radio" 
+                            name="gender" 
+                            value="otro" 
+                            required
+                            class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                        >
+                        <span class="ml-2 text-sm text-gray-700">Otro</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Contraseña -->
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                    Contraseña
+                </label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required
+                    minlength="8"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    placeholder="Mínimo 8 caracteres"
+                >
+            </div>
+
+            <!-- Confirmar Contraseña -->
+            <div>
+                <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-2">
+                    Confirmar Contraseña
+                </label>
+                <input 
+                    type="password" 
+                    id="confirm-password" 
+                    name="confirm-password" 
+                    required
+                    minlength="8"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    placeholder="Repite tu contraseña"
+                >
+            </div>
+
+            <!-- Botón de Registro -->
+            <button 
+                type="submit" 
+                class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+            >
+                Crear Cuenta
+            </button>
+
+            <!-- Link de Login -->
+            <div class="text-center">
                 <p class="text-sm text-gray-600">
-                    ¿Ya tienes cuenta? 
-                    <a href="login.html" class="text-blue-600 hover:text-blue-500 font-medium">
-                        Inicia sesión
-                    </a>
+                    ¿Ya tienes una cuenta? 
+                    <a href="#" class="text-blue-600 hover:text-blue-700 font-medium">Inicia sesión</a>
                 </p>
             </div>
-        </div>
+        </form>
     </div>
 </body>
-</html>
