@@ -279,7 +279,7 @@ app.post("/login", async (req, res) => {
   // Buscar usuario
   const { data: users, error } = await supabase
     .from("users")
-    .select("id, email, password_hash, role")
+    .select("id, email,fullname, password_hash, role")
     .eq("email", email)
     .single();
 
@@ -292,7 +292,14 @@ app.post("/login", async (req, res) => {
   if (!match) {
     return res.status(401).json({ error: "Usuario o contraseña inválidos" });
   }
-  res.json({ message: "Login correcto", users });
+    const userSafe = {
+    id: users.id,
+    email: users.email,
+    fullname: users.fullname,
+    role: users.role,
+  };
+
+  res.json({ message: "Login correcto", users:userSafe });
 });
 
 /* buscar todas las citas de un paciente */

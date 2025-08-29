@@ -1,4 +1,5 @@
 import axios from "axios";
+import { redirecto } from "../../router";
 
 export async function setupLogin() {
   const loginForm = document.getElementById("loginForm");
@@ -16,7 +17,17 @@ export async function setupLogin() {
         email,
         password,
       });
-      console.log("Login response", res.data);
+      const user =await res.data.users
+     localStorage.setItem("current", JSON.stringify(user))
+    if (user.role===2) {
+      redirecto("/dashboardDoctor")
+      
+    }else if(user.role===3){
+      redirecto("/dashboard")
+    }else{
+      redirecto("/404")
+    }
+
     } catch (err) {
       console.error("Error en login", err);
     }
