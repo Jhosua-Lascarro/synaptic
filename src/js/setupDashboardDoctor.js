@@ -26,7 +26,7 @@ async function loadCitas() {
 
 function render(cita) {
   return `
-        <div class="flex-1 p-6">
+        <div class="flex-1 p-0.5    ">
         <!-- Header -->
 
         <!-- Today's Appointments -->
