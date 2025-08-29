@@ -23,7 +23,7 @@ async function loadCitas() {
   }
 }
 
-function render() {
+function render(cita) {
   return `
         <div class="flex-1 p-6">
         <!-- Header -->
