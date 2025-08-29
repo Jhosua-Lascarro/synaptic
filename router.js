@@ -48,16 +48,16 @@ export async function renderRouter() {
     const content = await file.text();
     app.innerHTML = content;
 
+    // Redirect authenticated users away from auth pages to their appropriate dashboard
+    const userRole = getUserRole();
+    const isAuthPage = path === "/" || path === "/register";
+
     // guardian
     // Check if user has permission to access the current route
     if (!isRouteAllowed(path)) {
       window.history.replaceState({}, "", "/notfound");
       return renderRouter();
     }
-
-    // Redirect authenticated users away from auth pages to their appropriate dashboard
-    const userRole = getUserRole();
-    const isAuthPage = path === "/" || path === "/register";
 
     if (isAuthPage && userRole) {
       const redirectPath = userRole === 2 ? "/dashboardDoctor" : "/dashboard";
