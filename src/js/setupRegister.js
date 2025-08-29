@@ -27,7 +27,7 @@ export async function setupRegister() {
             birthdate: birthdate,
             sexo: gender,
             password_hash: password,
-            role: 2
+            role: 3
         }
 
 

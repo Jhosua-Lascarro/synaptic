@@ -170,14 +170,34 @@ app.post("/patiens", async (req, res) => {
 });
 
 app.get("/appointments", async (_req, res) => {
-  const { data, error } = await supabase.from("/appointments").select("*");
+  try {
+    const { data, error } = await supabase
+      .from("appointments")
+      .select(`
+        id,
+        appointment_date,
+        reason,
+        patiens (
+          id,
+          users (
+            id,
+            fullname,
+            email,
+            birthdate
+          )
+        )
+      `);
 
-  if (error) {
-    return res.status(500).json({ error: error.message });
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+
+    return res.json(data);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
   }
-
-  return res.json(data);
 });
+
 
 app.get("/appointments/patient/:id", async (req, res) => {
   const { id } = req.params;

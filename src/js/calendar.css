@@ -1,0 +1,51 @@
+/* Contenedor minimalista y responsivo */
+#calendar {
+  max-width: 350px;      /* pequeño y controlado */
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+#calendar:hover {
+  box-shadow: 0 4px 20px rgba(166, 17, 17, 0.12);
+}
+
+/* Estilo limpio para las celdas */
+.fc-daygrid-day {
+  border: none !important;
+  font-size: 0.8rem;
+}
+
+/* Días */
+.fc-daygrid-day-number {
+  font-weight: 500;
+  color: #857a7a;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.fc-daygrid-day-number:hover {
+  background: #f0f0f0;
+}
+
+/* Eventos minimalistas */
+.fc-event {
+  background: #007bff;
+  border: none;
+  font-size: 0.7rem;
+  padding: 2px 4px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+/* Responsivo */
+@media (max-width: 600px) {
+  #calendar {
+    max-width: 100%;
+    font-size: 0.75rem;
+  }
+}

@@ -1,3 +1,4 @@
+import { setupDashboard } from "@/js/setupDashboardDoctor";
 import { setupLogin } from "@/js/setupLogin";
 import { setupRegister } from "@/js/setupRegister";
 
@@ -15,6 +16,7 @@ const routes = {
   },
   "/dashboardDoctor": {
     path: "/views/dashboardDoctor.html",
+    setup:setupDashboard
   },
   "/notfound": {
     path: "/views/404.html",
