@@ -31,10 +31,10 @@ function getUserRole() {
 }
 
 // protect routes based on role
-function isRouteAllowed(path) {
-  const role = getUserRole();
-  if (path === "/dashboard" && role !== 3) return false; // only role 3 (patient) can access /dashboard
-  if (path === "/dashboardDoctor" && role !== 2) return false; // only role 2 (doctor) can access /dashboardDoctor
+function isRouteAllowed(path, role = null) {
+  const userRole = role || getUserRole();
+  if (path === "/dashboard" && userRole !== 3) return false;
+  if (path === "/dashboardDoctor" && userRole !== 2) return false;
   return true;
 }
 
@@ -42,28 +42,34 @@ export async function renderRouter() {
   const app = document.getElementById("app");
   const path = window.location.pathname;
   const route = routes[path] || routes["/notfound"];
+  const userRole = getUserRole();
+  const isAuthPage = path === "/" || path === "/register";
+  const isDashboardPage = path === "/dashboard" || path === "/dashboardDoctor";
 
   try {
-    const file = await fetch(route.path);
-    const content = await file.text();
-    app.innerHTML = content;
+    // Redirect unauthenticated users away from dashboard pages
+    if (isDashboardPage && !userRole) {
+      window.history.replaceState({}, "", "/");
+      return renderRouter();
+    }
 
-    // Redirect authenticated users away from auth pages to their appropriate dashboard
-    const userRole = getUserRole();
-    const isAuthPage = path === "/" || path === "/register";
-
-    // guardian
-    // Check if user has permission to access the current route
-    if (!isRouteAllowed(path)) {
+    // Check if authenticated user has permission to access the current route
+    if (userRole && !isRouteAllowed(path, userRole)) {
       window.history.replaceState({}, "", "/notfound");
       return renderRouter();
     }
 
+    // Redirect authenticated users away from auth pages to their appropriate dashboard
     if (isAuthPage && userRole) {
       const redirectPath = userRole === 2 ? "/dashboardDoctor" : "/dashboard";
       window.history.replaceState({}, "", redirectPath);
       return renderRouter();
     }
+
+    // Load and render the page content
+    const file = await fetch(route.path);
+    const content = await file.text();
+    app.innerHTML = content;
 
     // Execute route-specific setup function if available
     if (route.setup) {
