@@ -1,6 +1,8 @@
+import { redirecto } from "../../router";
 import { renderCalendarWidget } from "./calendar";
 
 export function setupDashboard() {
+  setupOutButton()
   renderCalendarWidget();
   loadCitas();
 }
@@ -54,5 +56,17 @@ function render(cita) {
    
   `;
 }
+
+function setupOutButton() {
+  const logout = document.getElementById("exit");
+  logout.addEventListener("click", (e) => {
+    e.preventDefault();
+    localStorage.removeItem("current");
+    redirecto("/")
+  });
+}
+
+
+
 
 
