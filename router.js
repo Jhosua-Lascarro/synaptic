@@ -24,6 +24,20 @@ const routes = {
   },
 };
 
+// get role from local storage
+function getUserRole() {
+  const user = JSON.parse(localStorage.getItem("current"));
+  return user ? user.role : null;
+}
+
+// protect routes based on role
+function isRouteAllowed(path) {
+  const role = getUserRole();
+  if (path === "/dashboard" && role !== 3) return false; // only role 3 (patient) can access /dashboard
+  if (path === "/dashboardDoctor" && role !== 2) return false; // only role 2 (doctor) can access /dashboardDoctor
+  return true;
+}
+
 export async function renderRouter() {
   const app = document.getElementById("app");
   const path = window.location.pathname;
@@ -33,38 +47,33 @@ export async function renderRouter() {
     const file = await fetch(route.path);
     const content = await file.text();
     app.innerHTML = content;
-    // route protection
-    // if user is not authenticated and wants to enter dashboard, redirect to login
-    if (
-      (path === "/dashboard" || path === "/dashboardDoctor") &&
-      !localStorage.getItem("current")
-    ) {
-      window.history.replaceState({}, "", "/");
-      return renderRouter();
-    }
-    // if user is authenticated and wants to enter login or register, redirect to dashboardDoctor
 
-    if (
-      (path === "/" || path === "/register") &&
-      localStorage.getItem("current")
-    ) {
-      window.history.replaceState({}, "", "/dashboardDoctor");
-      return renderRouter();
-    }
-
-    // if user tries to access a route that doesn't exist, redirect to 404
-    if (!routes[path]) {
+    // guardian
+    // Check if user has permission to access the current route
+    if (!isRouteAllowed(path)) {
       window.history.replaceState({}, "", "/notfound");
       return renderRouter();
     }
+
+    // Redirect authenticated users away from auth pages to their appropriate dashboard
+    const userRole = getUserRole();
+    const isAuthPage = path === "/" || path === "/register";
+
+    if (isAuthPage && userRole) {
+      const redirectPath = userRole === 2 ? "/dashboardDoctor" : "/dashboard";
+      window.history.replaceState({}, "", redirectPath);
+      return renderRouter();
+    }
+
+    // Execute route-specific setup function if available
     if (route.setup) {
       route.setup();
     }
   } catch (error) {
-    console.error("Error loading the page:", error);
-    app.innerHTML = "<h1>Error loading the page</h1>";
+    console.error("Error loading page:", error);
   }
 }
+
 export function redirecto(path) {
   window.history.replaceState({}, "", `${path}`);
   return renderRouter();
