@@ -1,7 +1,7 @@
 import { redirecto } from "../../router";
 import { renderCalendarWidget } from "./calendar";
 
-export function setupDashboard() {
+export function setupDashboardDoctor() {
   setTimeout(() => {
     setupOutButtonDoctor();
     renderCalendarWidget();
@@ -73,7 +73,6 @@ export function setupOutButtonDoctor() {
     }
   }, 0);
 }
-
 
 function infoUserDoctor() {
   const contentLetter = document.getElementById("firsletter");
