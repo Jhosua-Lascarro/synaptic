@@ -3,7 +3,7 @@ import { renderCalendarWidget } from "./calendar";
 
 export function setupDashboard() {
   setTimeout(() => {
-    setupOutButton();
+    setupOutButtonDoctor();
     renderCalendarWidget();
     loadCitas();
   }, 0);
@@ -58,7 +58,7 @@ function render() {
   `;
 }
 
-export function setupOutButton() {
+export function setupOutButtonDoctor() {
   setTimeout(() => {
     const logout = document.getElementById("exit");
     if (logout) {
