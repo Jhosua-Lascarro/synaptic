@@ -340,32 +340,49 @@ app.get("/appointments/fecha", async (req, res) => {
   const startDate = `${date}T00:00:00`;
   const endDate   = `${date}T23:59:59`;
 
-  const { data, error } = await supabase
-    .from("appointments")
-    .select(`
-      id,
-      reason,
-      appointment_date,
-      patiens (
-        id,
-        users (
-          fullname,
-          birthdate
-        )
-      )
-    `)
-    .gte("appointment_date", startDate) // mayor o igual al inicio del día
-    .lte("appointment_date", endDate); // menor o igual al final del día
+    const { data, error } = await supabase
+        .from("appointments")
+        .select(`
+            id,
+            reason,
+            appointment_date,
+            patiens (
+                id,
+                users (
+                    fullname,
+                    birthdate
+                )
+            ),
+            doctors ( users ( fullname ) ),
+            status ( name )
+        `)
+        .gte("appointment_date", startDate)
+        .lte("appointment_date", endDate)
+        .order("appointment_date", { ascending: true }); // Añadido para consistencia
 
-  if (error) return res.status(500).json({ error: error.message });
+    if (error) {
+        console.error('Error fetching appointments by date:', error.message);
+        return res.status(500).json({ error: error.message });
+    }
 
-  res.json(data);
+    // Aplanar la estructura de la respuesta
+    const formattedAppointments = data.map(app => ({
+        id: app.id,
+        reason: app.reason,
+        appointment_date: app.appointment_date,
+        patient_id: app.patiens?.id,
+        patient_fullname: app.patiens?.users?.fullname,
+        patient_birthdate: app.patiens?.users?.birthdate,
+        doctor_fullname: app.doctors?.users?.fullname,
+        status_name: app.status?.name
+    }));
+
+    res.json(formattedAppointments);
 });
 
 
-app.listen(3000, (error) => {
-  if (error) {
-    console.error("error en el servidor", error.message);
-  }
-  console.log("servidor arriba en puerto http://localhost:3000");
+// Inicia el servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log("Servidor arriba en puerto http://localhost:3000");
 });
