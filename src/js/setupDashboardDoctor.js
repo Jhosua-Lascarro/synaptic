@@ -2,9 +2,11 @@ import { redirecto } from "../../router";
 import { renderCalendarWidget } from "./calendar";
 
 export function setupDashboard() {
-  setupOutButton()
-  renderCalendarWidget();
-  loadCitas();
+  setTimeout(() => {
+    setupOutButton();
+    renderCalendarWidget();
+    loadCitas();
+  }, 0);
 }
 async function loadCitas() {
   const content = document.getElementById("content-page");
@@ -13,17 +15,16 @@ async function loadCitas() {
     const data = await res.json();
 
     data.forEach((cita) => {
-        content.innerHTML += render(cita)
-            console.log(cita)
-      
+      content.innerHTML += render(cita);
+      console.log(cita);
     });
   } catch (error) {
-    console.error("no se pudo traer los datos");
+    console.error("no se pudo traer los datos", error);
   }
 }
 
-function render(cita) {
-     return `
+function render() {
+  return `
         <div class="flex-1 p-6">
         <!-- Header -->
 
@@ -53,20 +54,21 @@ function render(cita) {
         </div>
       </div>
 
-   
+
   `;
 }
 
-function setupOutButton() {
-  const logout = document.getElementById("exit");
-  logout.addEventListener("click", (e) => {
-    e.preventDefault();
-    localStorage.removeItem("current");
-    redirecto("/")
-  });
+export function setupOutButton() {
+  setTimeout(() => {
+    const logout = document.getElementById("exit");
+    if (logout) {
+      logout.addEventListener("click", (e) => {
+        e.preventDefault();
+        localStorage.removeItem("current");
+        redirecto("/");
+      });
+    } else {
+      console.error("Element with id 'exit' not found");
+    }
+  }, 0);
 }
-
-
-
-
-
