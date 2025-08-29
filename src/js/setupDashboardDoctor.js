@@ -10,7 +10,7 @@ export function setupDashboardDoctor() {
   }, 0);
 }
 async function loadCitas() {
-  const content = document.getElementById("content-page");
+  const content = document.getElementById("content-citas");
   try {
     const res = await fetch("http://localhost:3000/appointments");
     const data = await res.json();

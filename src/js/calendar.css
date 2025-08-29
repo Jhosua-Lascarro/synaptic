@@ -1,12 +1,15 @@
 /* Contenedor minimalista y responsivo */
 #calendar {
   max-width: 350px;      /* pequeño y controlado */
-  margin: 0 auto;
+  margin:  auto;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.08);
   padding: 10px;
   transition: all 0.3s ease;
+  position: relative;
+  
+  margin-right: 5%;
 }
 
 #calendar:hover {
@@ -26,6 +29,7 @@
   padding: 4px;
   border-radius: 6px;
   transition: background 0.2s ease;
+  cursor: pointer;
 }
 
 .fc-daygrid-day-number:hover {
