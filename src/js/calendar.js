@@ -1,7 +1,7 @@
 import { Calendar } from "@fullcalendar/core";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import esLocale from "@fullcalendar/core/locales/es";
-import interactionPlugin from "@fullcalendar/interaction"; // 🔥 necesario para dateClick
+import interactionPlugin from "@fullcalendar/interaction"; 
 import "./calendar.css";
 import { getDateAppointmetns } from "@/auth/calendarApi";
 
@@ -27,7 +27,7 @@ export function renderCalendarWidget() {
       const citas = await getDateAppointmetns(fechaSeleccionada);
       console.log(citas);
 
-      loadCitas(citas); // 👈 ahora le pasamos las citas a la función
+      loadCitas(citas); 
     },
   });
 
@@ -36,26 +36,30 @@ export function renderCalendarWidget() {
 
 async function loadCitas(citas) {
   const content = document.getElementById("content-citas");
-  content.innerHTML = ""; // limpio lo que haya
+  content.innerHTML = ""; 
 
   
 
   if (!Array.isArray(citas)) {
     console.warn("Las citas no son un array, convirtiendo...");
     citas = Object.values(citas);
+    const cita =citas.flat()
+   
   }
-   if (citas.length === 0) {
+   if (cita.length === 0) {
     content.innerHTML = `<p>No hay citas para esta fecha.</p>`;
     return;
   }
 
-  // 👇 recorro las citas con forEach y voy construyendo el HTML
+ 
   citas.forEach((cita) => {
     content.innerHTML += renderCita(cita);
   });
 }
 
 function renderCita(cita) {
+  const nombre =cita.patiens.users.fullname
+  const fechaNacimiento =cita.patiens.users.birthdate
   return `
     <div class="flex-1 p-0.5">
       <div class="bg-white rounded-lg border border-gray-200 p-6">
@@ -69,8 +73,8 @@ function renderCita(cita) {
               <h3 class="font-medium text-gray-800"> Consulta:
                 ${cita.reason }
               </h3>
-              <p class="text-sm text-gray-600 mt-1">Paciente: ${cita.patiens.users.fullname  ?? "N/A"}</p>
-              <p class="text-sm text-gray-600">Años: ${cita.patiens.users.birthdate ?? "-"}</p>
+              <p class="text-sm text-gray-600 mt-1">Paciente: ${nombre }</p>
+              <p class="text-sm text-gray-600">Años: ${calcularEdad(fechaNacimiento)}</p>
             </div>
             <span class="text-sm font-medium text-gray-700">${cita.appointment_date}</span>
           </div>
@@ -79,3 +83,22 @@ function renderCita(cita) {
     </div>
   `;
 }
+
+
+function calcularEdad(fechaNacimiento) {
+  const hoy = new Date();
+  const nacimiento = new Date(fechaNacimiento);
+
+  let edad = hoy.getFullYear() - nacimiento.getFullYear();
+  const mes = hoy.getMonth() - nacimiento.getMonth();
+
+  // Si aún no ha cumplido años este mes, restamos 1
+  if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+    edad--;
+  }
+
+  return edad;
+  
+}
+
+
