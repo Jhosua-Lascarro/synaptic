@@ -8,7 +8,7 @@ export function renderCalendarWidget() {
   const calendarEl = document.getElementById("calendar");
 
   const calendar = new Calendar(calendarEl, {
-    plugins: [dayGridPlugin,interactionPlugin],
+    plugins: [dayGridPlugin, interactionPlugin],
     initialView: "dayGridMonth",
     locale: esLocale,
     headerToolbar: {
@@ -20,14 +20,9 @@ export function renderCalendarWidget() {
     contentHeight: 300,
     aspectRatio: 1.5,
 
-    dateClick: function (info) {
-      const dateObj = info.date;
-      const day = dateObj.getDate();          // corregido
-      const month = dateObj.getMonth() + 1;
-      const year = dateObj.getFullYear();     // corregido
-
-      const fecha = [day, month, year];
-      console.log("esta esx la fecha ",fecha);
+    dateClick: async function (info) {
+      const fechaSeleccionada = info.dateStr;
+      console.log(fechaSeleccionada);
     },
   });
 
