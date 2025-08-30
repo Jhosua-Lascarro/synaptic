@@ -23,21 +23,31 @@ export function renderCalendarWidget() {
 
     dateClick: async function (info) {
       const fechaSeleccionada = info.dateStr;
-
       const citas = await getDateAppointmetns(fechaSeleccionada);
       console.log(citas);
-
       loadCitas(citas);
+    },
+
+    dayCellDidMount: async function (arg) {
+      const fecha = arg.date.toISOString().split("T")[0];
+
+      const citas = await getDateAppointmetns(fecha);
+
+      if (citas && citas.length > 0) {
+        arg.el.style.backgroundColor = "#d1fae5";
+      } else {
+        arg.el.style.backgroundColor = "#f3f4f6";
+      }
     },
   });
 
   calendar.render();
 }
+
 async function loadCitas(citas) {
   const content = document.getElementById("content-citas");
   content.innerHTML = "";
 
-  // Normalizamos siempre a array
   if (!Array.isArray(citas)) {
     console.warn("Las citas no son un array, convirtiendo...");
     citas = Object.values(citas).flat();
@@ -59,24 +69,21 @@ function renderCita(cita) {
   return `
     <div class="flex-1 p-0.5">
       <div class="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">
-          Appointment
-        </h2>
-
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Appointment</h2>
         <div class="space-y-4">
           <div class="bg-gray-50 rounded-lg p-4 flex justify-between items-start">
             <div>
-              <h3 class="font-medium text-gray-800"> Consulta:
-                ${cita.reason}
-              </h3>
+              <h3 class="font-medium text-gray-800">Consulta: ${
+                cita.reason
+              }</h3>
               <p class="text-sm text-gray-600 mt-1">Paciente: ${nombre}</p>
-              <p class="text-sm text-gray-600">
-                Años: ${calcularEdad(fechaNacimiento)}
-              </p>
+              <p class="text-sm text-gray-600">Años: ${calcularEdad(
+                fechaNacimiento
+              )}</p>
             </div>
-            <span class="text-sm font-medium text-gray-700">${
-             convertDate(cita.appointment_date)
-            }</span>
+            <span class="text-sm font-medium text-gray-700">${convertDate(
+              cita.appointment_date
+            )}</span>
           </div>
         </div>
       </div>
@@ -87,14 +94,11 @@ function renderCita(cita) {
 function calcularEdad(fechaNacimiento) {
   const hoy = new Date();
   const nacimiento = new Date(fechaNacimiento);
-
   let edad = hoy.getFullYear() - nacimiento.getFullYear();
   const mes = hoy.getMonth() - nacimiento.getMonth();
-
   if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
     edad--;
   }
-
   return edad;
 }
 
@@ -105,6 +109,4 @@ function convertDate(convertDate) {
     month: "long",
     day: "numeric",
   });
-
-  
 }

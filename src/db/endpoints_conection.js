@@ -614,7 +614,7 @@ app.post("/login", async (req, res) => {
   // Find user
   const { data: users, error } = await supabase
     .from("users")
-    .select("id, email, fullname, password_hash, role")
+    .select("id, email, fullname, password_hash, role,identification")
     .eq("email", email)
     .single();
 
@@ -636,6 +636,7 @@ app.post("/login", async (req, res) => {
     email: users.email,
     fullname: users.fullname,
     role: users.role,
+    identification:users.identification
   };
 
   res.json({ message: "Login successful", users: userSafe });
