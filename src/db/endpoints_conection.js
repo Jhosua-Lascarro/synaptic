@@ -1,24 +1,17 @@
 import bcrypt from "bcrypt";
 import cors from "cors";
 import express from "express";
-import { supabase } from "./conection_db.js"; // Asegúrate de que esta ruta sea correcta para tu configuración de Supabase
+import { supabase } from "./conection_db.js";
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
 
-// --- Endpoints de USUARIOS (CRUD Básico y Autenticación) ---
+// --- USER Endpoints (Basic CRUD and Authentication) --
 
-// Endpoint de prueba (original)
-app.get("/", async (request, response) => {
-  console.log("ola mundo");
-  response.send("holaaaaa");
-});
-
-// Obtener todos los usuarios (original)
+// Get all users
 app.get("/users", async (_req, res) => {
-  // Cambiado a /users para evitar conflicto con la raíz y ser más específico
   const { data, error } = await supabase.from("users").select("*");
 
   if (error) {
@@ -28,15 +21,14 @@ app.get("/users", async (_req, res) => {
   return res.json(data);
 });
 
-// Crear un nuevo usuario (original)
+// Create a new user
 app.post("/users", async (req, res) => {
-  // Cambiado a /users para ser más específico
   const {
     fullname,
-    emailInput, // Cambiado de email a emailInput para evitar confusión con email de Supabase si se usa un alias
+    emailInput,
     identification,
     role,
-    password_hash, // Se espera el password_hash en el body, pero se encriptará aquí
+    password_hash,
     birthdate,
     phone,
     sexo,
@@ -49,13 +41,13 @@ app.post("/users", async (req, res) => {
 
   if (errorEmail) {
     console.error("Error checking existing user email:", errorEmail.message);
-    return res.status(500).json({ message: "error al verificar correo" });
+    return res.status(500).json({ message: "error verifying email" });
   }
   if (existingUser && existingUser.length !== 0) {
-    return res.status(400).json({ message: "el usuario ya esta registrado" });
+    return res.status(400).json({ message: "user already registered" });
   }
 
-  // Encriptar la contraseña antes de insertarla
+  // Encrypt the password before inserting
   const hashPassword = await bcrypt.hash(password_hash, 10);
   const { data, error } = await supabase
     .from("users")
@@ -65,7 +57,7 @@ app.post("/users", async (req, res) => {
         email: emailInput,
         identification,
         role,
-        password_hash: hashPassword, // Guardar el hash
+        password_hash: hashPassword,
         birthdate,
         phone,
         sexo,
@@ -79,12 +71,11 @@ app.post("/users", async (req, res) => {
   }
 
   console.log("New user registered:", data);
-  return res.status(201).json({ message: "Registro exitoso", user: data[0] });
+  return res.status(201).json({ message: "Registration successful", user: data[0] });
 });
 
-// Actualizar un usuario por ID (original)
+// Update a user by ID
 app.put("/users/:id", async (req, res) => {
-  // Cambiado a /users/:id para ser más específico
   const { id } = req.params;
   const {
     fullname,
@@ -105,7 +96,7 @@ app.put("/users/:id", async (req, res) => {
   if (phone) inputUpdate.phone = phone;
   if (sexo) inputUpdate.sexo = sexo;
 
-  // Si se proporciona una nueva contraseña, encriptarla
+  // If a new password is provided, encrypt it
   if (password_hash) {
     inputUpdate.password_hash = await bcrypt.hash(password_hash, 10);
   }
@@ -121,12 +112,11 @@ app.put("/users/:id", async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
   console.log("User updated:", data);
-  return res.json(data[0]); // Retornar el usuario actualizado
+  return res.json(data[0]);
 });
 
-// Eliminar un usuario por ID (original)
+// Delete a user by ID
 app.delete("/users/:id", async (req, res) => {
-  // Cambiado a /users/:id para ser más específico
   const { id } = req.params;
   const { data, error } = await supabase
     .from("users")
@@ -140,13 +130,13 @@ app.delete("/users/:id", async (req, res) => {
   }
 
   if (!data || data.length === 0) {
-    return res.status(404).json({ message: "usuario no encontrado" });
+    return res.status(404).json({ message: "user not found" });
   }
 
-  return res.json({ message: "usuario eliminado", data: data[0] });
+  return res.json({ message: "user deleted", data: data[0] });
 });
 
-// Endpoint para obtener los detalles de un usuario por su ID (para dashboard)
+// Get user details by ID (for dashboard)
 app.get("/users/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
@@ -163,23 +153,23 @@ app.get("/users/:userId", async (req, res) => {
         "Error fetching user details (for dashboard):",
         error?.message
       );
-      return res.status(404).json({ message: "Usuario no encontrado." });
+      return res.status(404).json({ message: "User not found." });
     }
     res.status(200).json(userDetails);
   } catch (error) {
     console.error(
-      "Error al obtener detalles del usuario (for dashboard):",
+      "Error getting user details (for dashboard):",
       error.message
     );
     res.status(500).json({
-      message: "Error interno del servidor al obtener detalles del usuario.",
+      message: "Internal server error getting user details.",
     });
   }
 });
 
-// --- Endpoints de ROLES (Doctors y Patients) ---
+// --- ROLE Endpoints (Doctors and Patients) ---
 
-// Crear un doctor (original)
+// Create a doctor
 app.post("/doctors", async (req, res) => {
   const { user_id, years_expirence } = req.body;
   const { data: users, error: errorUsers } = await supabase
@@ -190,7 +180,7 @@ app.post("/doctors", async (req, res) => {
 
   if (errorUsers || !users) {
     console.error("Error finding user for new doctor:", errorUsers?.message);
-    return res.status(404).json({ error: "usuario no encontrado" });
+    return res.status(404).json({ error: "user not found" });
   }
 
   const { data, error } = await supabase
@@ -205,18 +195,18 @@ app.post("/doctors", async (req, res) => {
   return res.status(201).json(data[0]);
 });
 
-// Crear un paciente (original)
+// Create a patient
 app.post("/patiens", async (req, res) => {
   const { user_id } = req.body;
   const { data: users, error: errorUsers } = await supabase
     .from("users")
-    .select("id") // Necesitamos seleccionar 'id' para que `users` no sea nulo si no hay otros campos
+    .select("id")
     .eq("id", user_id)
     .single();
 
   if (errorUsers || !users) {
     console.error("Error finding user for new patient:", errorUsers?.message);
-    return res.status(404).json({ error: "usuario no encontrado" }); // Cambiado de "paciente no encontrado" a "usuario no encontrado"
+    return res.status(404).json({ error: "user not found" });
   }
 
   const { data, error } = await supabase
@@ -231,7 +221,7 @@ app.post("/patiens", async (req, res) => {
   return res.status(201).json(data[0]);
 });
 
-// Endpoint para obtener el patient_id de un usuario (para dashboard)
+// Get patient_id of a user (for dashboard)
 app.get("/patients/user/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
@@ -245,16 +235,16 @@ app.get("/patients/user/:userId", async (req, res) => {
       console.error("Error fetching patient ID:", error?.message);
       return res
         .status(404)
-        .json({ message: "Paciente no encontrado para este usuario." });
+        .json({ message: "Patient not found for this user." });
     }
-    res.status(200).json(patient); // Retorna { id: patient_id }
+    res.status(200).json(patient);
   } catch (error) {
-    console.error("Error al obtener patient_id:", error.message);
-    res.status(500).json({ message: "Error interno del servidor." });
+    console.error("Error getting patient_id:", error.message);
+    res.status(500).json({ message: "Internal server error." });
   }
 });
 
-// Endpoint para obtener el doctor_id de un usuario (para dashboard)
+// Get doctor_id of a user (for dashboard)
 app.get("/doctors/user/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
@@ -268,18 +258,18 @@ app.get("/doctors/user/:userId", async (req, res) => {
       console.error("Error fetching doctor ID:", error?.message);
       return res
         .status(404)
-        .json({ message: "Doctor no encontrado para este usuario." });
+        .json({ message: "Doctor not found for this user." });
     }
-    res.status(200).json(doctor); // Retorna { id: doctor_id }
+    res.status(200).json(doctor);
   } catch (error) {
-    console.error("Error al obtener doctor_id:", error.message);
-    res.status(500).json({ message: "Error interno del servidor." });
+    console.error("Error getting doctor_id:", error.message);
+    res.status(500).json({ message: "Internal server error." });
   }
 });
 
-// --- Endpoints de CITAS (Appointments) ---
+// --- APPOINTMENT Endpoints ---
 
-// Obtener todas las citas con detalles de paciente (original)
+// Get all appointments with patient details
 app.get("/appointments", async (_req, res) => {
   try {
     const { data, error } = await supabase.from("appointments").select(`
@@ -304,7 +294,7 @@ app.get("/appointments", async (_req, res) => {
       return res.status(500).json({ error: error.message });
     }
 
-    // Aplanar la estructura para facilitar el consumo en el frontend
+    // Flatten the structure for easier frontend consumption
     const formattedAppointments = data.map((app) => ({
       id: app.id,
       appointment_date: app.appointment_date,
@@ -324,7 +314,7 @@ app.get("/appointments", async (_req, res) => {
   }
 });
 
-// Obtener citas de un paciente por ID (original - simplificado, usaremos el endpoint del dashboard para más detalles)
+// Get appointments for a patient by ID
 app.get("/appointments/patient/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -344,18 +334,18 @@ app.get("/appointments/patient/:id", async (req, res) => {
   if (!data || data.length === 0) {
     return res
       .status(404)
-      .json({ error: "No se encontraron citas para este paciente" });
+      .json({ error: "No appointments found for this patient" });
   }
 
   return res.json(data);
 });
 
-// Crear una nueva cita (original)
+// Create a new appointment
 app.post("/appointments", async (req, res) => {
   const { patient_id, doctor_id, appointment_date, status_id, reason, notes } =
     req.body;
 
-  // Verificar si el paciente existe
+  // Verify if the patient exists
   const { data: patientData, error: errorPatient } = await supabase
     .from("patiens")
     .select("id")
@@ -367,10 +357,10 @@ app.post("/appointments", async (req, res) => {
       "Error finding patient for new appointment:",
       errorPatient?.message
     );
-    return res.status(404).json({ error: "paciente no encontrado" });
+    return res.status(404).json({ error: "patient not found" });
   }
 
-  // Opcional: Verificar si el doctor existe (no estaba en tu original, pero es buena práctica)
+  // Verify if the doctor exists
   const { data: doctorData, error: errorDoctor } = await supabase
     .from("doctors")
     .select("id")
@@ -382,7 +372,7 @@ app.post("/appointments", async (req, res) => {
       "Error finding doctor for new appointment:",
       errorDoctor?.message
     );
-    return res.status(404).json({ error: "doctor no encontrado" });
+    return res.status(404).json({ error: "doctor not found" });
   }
 
   const { data, error } = await supabase
@@ -399,10 +389,10 @@ app.post("/appointments", async (req, res) => {
   return res.status(201).json(data[0]);
 });
 
-// Actualizar una cita (parcialmente) por ID (original)
+// Partially update an appointment by ID
 app.patch("/appointments/:id", async (req, res) => {
   const { id } = req.params;
-  const { reason, status_id, notes, appointment_date, doctor_id } = req.body; // Añadir más campos para actualizar
+  const { reason, status_id, notes, appointment_date, doctor_id } = req.body;
 
   const inputUpdate = {};
   if (reason !== undefined) inputUpdate.reason = reason;
@@ -423,7 +413,7 @@ app.patch("/appointments/:id", async (req, res) => {
       `Error finding appointment ${id} for update:`,
       errorAppointment?.message
     );
-    return res.status(404).json({ error: "cita no encontrada" });
+    return res.status(404).json({ error: "appointment not found" });
   }
 
   const { data, error } = await supabase
@@ -436,20 +426,20 @@ app.patch("/appointments/:id", async (req, res) => {
     console.error(`Error updating appointment ${id}:`, error.message);
     return res.status(500).json({ error: error.message });
   }
-  return res.status(200).json(data[0]); // Retorna el dato actualizado
+  return res.status(200).json(data[0]);
 });
 
-/*este es el endpoint para llamar las citas por fecha en la vista de doctor  */
+// Get appointments by date in doctor view
 app.get("/appointments/fecha", async (req, res) => {
-  const { date } = req.query; // YYYY-MM-DD
+  const { date } = req.query;
 
   if (!date) {
     return res
       .status(400)
-      .json({ error: "Debe enviar la fecha en query ?date=YYYY-MM-DD" });
+      .json({ error: "Must send date in query ?date=YYYY-MM-DD" });
   }
 
-  // Definimos el rango de ese día
+  // Define the range for that day
   const startDate = `${date}T00:00:00`;
   const endDate = `${date}T23:59:59`;
 
@@ -469,8 +459,8 @@ app.get("/appointments/fecha", async (req, res) => {
       )
     `
     )
-    .gte("appointment_date", startDate) // mayor o igual al inicio del día
-    .lte("appointment_date", endDate); // menor o igual al final del día
+    .gte("appointment_date", startDate)
+    .lte("appointment_date", endDate);
 
   if (error) return res.status(500).json({ error: error.message });
   if (!data || data.length === 0) {
@@ -481,7 +471,7 @@ app.get("/appointments/fecha", async (req, res) => {
   res.json(data);
 });
 
-// Endpoint para obtener citas de un paciente para un mes y año específicos (para dashboard)
+// Get patient appointments for a specific month and year (for dashboard)
 app.get(
   "/appointments/patient/:patientId/month/:year/:month",
   async (req, res) => {
@@ -489,7 +479,7 @@ app.get(
       const { patientId, year, month } = req.params;
 
       const startDate = new Date(year, month - 1, 1).toISOString();
-      const endDate = new Date(year, month, 0, 23, 59, 59, 999).toISOString(); // Fin del último día del mes
+      const endDate = new Date(year, month, 0, 23, 59, 59, 999).toISOString();
 
       const { data: appointments, error } = await supabase
         .from("appointments")
@@ -518,11 +508,11 @@ app.get(
           error.message
         );
         return res.status(500).json({
-          message: "Error interno del servidor al obtener citas de paciente.",
+          message: "Internal server error getting patient appointments.",
         });
       }
 
-      // Aplanamos la estructura de la respuesta para que sea más fácil de consumir en el frontend
+      // Flatten the response structure for easier frontend consumption
       const formattedAppointments = appointments.map((app) => ({
         id: app.id,
         patient_id: app.patient_id,
@@ -531,25 +521,25 @@ app.get(
         status_id: app.status_id,
         reason: app.reason,
         notes: app.notes,
-        status_name: app.status?.name, // Acceso seguro
-        doctor_name: app.doctors?.users?.fullname, // Acceso seguro
-        patient_name: app.patiens?.users?.fullname, // Acceso seguro
+        status_name: app.status?.name,
+        doctor_name: app.doctors?.users?.fullname,
+        patient_name: app.patiens?.users?.fullname,
       }));
 
       res.status(200).json(formattedAppointments);
     } catch (error) {
       console.error(
-        "Error al obtener citas de paciente mensuales:",
+        "Error getting monthly patient appointments:",
         error.message
       );
       res.status(500).json({
-        message: "Error interno del servidor al obtener citas de paciente.",
+        message: "Internal server error getting patient appointments.",
       });
     }
   }
 );
 
-// Endpoint para obtener citas de un doctor para un mes y año específicos (para dashboard)
+// Get doctor appointments for a specific month and year (for dashboard)
 app.get(
   "/appointments/doctor/:doctorId/month/:year/:month",
   async (req, res) => {
@@ -557,7 +547,7 @@ app.get(
       const { doctorId, year, month } = req.params;
 
       const startDate = new Date(year, month - 1, 1).toISOString();
-      const endDate = new Date(year, month, 0, 23, 59, 59, 999).toISOString(); // Fin del último día del mes
+      const endDate = new Date(year, month, 0, 23, 59, 59, 999).toISOString();
 
       const { data: appointments, error } = await supabase
         .from("appointments")
@@ -586,11 +576,11 @@ app.get(
           error.message
         );
         return res.status(500).json({
-          message: "Error interno del servidor al obtener citas de doctor.",
+          message: "Internal server error getting doctor appointments.",
         });
       }
 
-      // Aplanamos la estructura de la respuesta para que sea más fácil de consumir en el frontend
+      // Flatten the response structure for easier frontend consumption
       const formattedAppointments = appointments.map((app) => ({
         id: app.id,
         patient_id: app.patient_id,
@@ -599,29 +589,29 @@ app.get(
         status_id: app.status_id,
         reason: app.reason,
         notes: app.notes,
-        status_name: app.status?.name, // Acceso seguro
-        doctor_name: app.doctors?.users?.fullname, // Acceso seguro
-        patient_name: app.patiens?.users?.fullname, // Acceso seguro
+        status_name: app.status?.name,
+        doctor_name: app.doctors?.users?.fullname,
+        patient_name: app.patiens?.users?.fullname,
       }));
 
       res.status(200).json(formattedAppointments);
     } catch (error) {
       console.error(
-        "Error al obtener citas de doctor mensuales:",
+        "Error getting monthly doctor appointments:",
         error.message
       );
       res.status(500).json({
-        message: "Error interno del servidor al obtener citas de doctor.",
+        message: "Internal server error getting doctor appointments.",
       });
     }
   }
 );
 
-// Login de autenticación para abrir el dashboard (original)
+// Authentication login to open dashboard
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  // Buscar usuario
+  // Find user
   const { data: users, error } = await supabase
     .from("users")
     .select("id, email, fullname, password_hash, role")
@@ -633,13 +623,13 @@ app.post("/login", async (req, res) => {
       "Login error (user not found in DB):",
       error?.message || "User not found"
     );
-    return res.status(401).json({ error: "Usuario no encontrado" });
+    return res.status(401).json({ error: "User not found" });
   }
 
   const match = await bcrypt.compare(password, users.password_hash);
 
   if (!match) {
-    return res.status(401).json({ error: "Usuario o contraseña inválidos" });
+    return res.status(401).json({ error: "Invalid user or password" });
   }
   const userSafe = {
     id: users.id,
@@ -648,12 +638,12 @@ app.post("/login", async (req, res) => {
     role: users.role,
   };
 
-  res.json({ message: "Login correcto", users: userSafe });
+  res.json({ message: "Login successful", users: userSafe });
 });
 
-// Buscar todas las citas de un paciente con detalles (original - pero modificado para ser más completo para el dashboard)
+// Find all appointments for a patient with details
 app.get("/patients/appointments/:id", async (req, res) => {
-  const id = req.params.id; // Este 'id' es el patient_id
+  const id = req.params.id;
 
   const { data: appointments, error: appointmentsError } = await supabase
     .from("appointments")
@@ -667,7 +657,7 @@ app.get("/patients/appointments/:id", async (req, res) => {
             patiens ( users ( id, fullname, email, birthdate, role ) )
             `
     )
-    .eq("patient_id", id); // Usamos patient_id aquí
+    .eq("patient_id", id);
 
   if (appointmentsError) {
     console.error(
@@ -680,10 +670,10 @@ app.get("/patients/appointments/:id", async (req, res) => {
   if (!appointments || appointments.length === 0) {
     return res
       .status(404)
-      .json({ error: "No se encontraron citas para este paciente" });
+      .json({ error: "No appointments found for this patient" });
   }
 
-  // Aplanar la estructura para facilitar el consumo en el frontend
+  // Flatten the structure for easier frontend consumption
   const formattedAppointments = appointments.map((app) => ({
     id: app.id,
     appointment_date: app.appointment_date,
@@ -700,18 +690,18 @@ app.get("/patients/appointments/:id", async (req, res) => {
   res.json(formattedAppointments);
 });
 
-// Obtener citas por fecha específica (original)
+// Get appointments by specific date
 app.get("/appointments/fecha", async (req, res) => {
-  const { date } = req.query; // YYYY-MM-DD
+  const { date } = req.query;
 
   if (!date) {
     return res
       .status(400)
-      .json({ error: "Debe enviar la fecha en query ?date=YYYY-MM-DD" });
+      .json({ error: "Must send date in query ?date=YYYY-MM-DD" });
   }
 
-  // Definimos el rango de ese día
-  const startDate = `${date}T00:00:00.000Z`; // Asegúrate de que el formato ISO sea correcto para Supabase
+  // Define the range for that day
+  const startDate = `${date}T00:00:00.000Z`;
   const endDate = `${date}T23:59:59.999Z`;
 
   const { data, error } = await supabase
@@ -734,14 +724,14 @@ app.get("/appointments/fecha", async (req, res) => {
     )
     .gte("appointment_date", startDate)
     .lte("appointment_date", endDate)
-    .order("appointment_date", { ascending: true }); // Añadido para consistencia
+    .order("appointment_date", { ascending: true });
 
   if (error) {
     console.error("Error fetching appointments by date:", error.message);
     return res.status(500).json({ error: error.message });
   }
 
-  // Aplanar la estructura de la respuesta
+  // Flatten the response structure
   const formattedAppointments = data.map((app) => ({
     id: app.id,
     reason: app.reason,
@@ -756,7 +746,7 @@ app.get("/appointments/fecha", async (req, res) => {
   res.json(formattedAppointments);
 });
 
-// Inicia el servidor
+// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log("Servidor arriba en puerto http://localhost:3000");

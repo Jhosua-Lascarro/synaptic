@@ -1,19 +1,16 @@
 import { redirecto } from "../../router";
 import { renderCalendarWidget } from "./calendar";
 
+// Function to setup the doctor's dashboard
 export function setupDashboardDoctor() {
   setTimeout(() => {
      infoUserDoctor();
     setupOutButtonDoctor();
     renderCalendarWidget();
-    
-
-  
-   
   }, 100);
 }
 
-
+// Function to setup the logout button for doctor
 export function setupOutButtonDoctor() {
   setTimeout(() => {
     const logout = document.getElementById("exit");
@@ -29,6 +26,7 @@ export function setupOutButtonDoctor() {
   }, 0);
 }
 
+// Function to display doctor's user info
 function infoUserDoctor() {
   const contentLetter = document.getElementById("firsletter");
   const user = JSON.parse(localStorage.getItem("current"));

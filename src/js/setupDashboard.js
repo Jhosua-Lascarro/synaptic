@@ -1,28 +1,28 @@
 import axios from 'axios';
 
+// Base Axios configuration to avoid repeating the base URL
 export async function setupDashboard() {
-    // Configuración base de Axios para evitar repetir la URL base
     axios.defaults.baseURL = 'http://localhost:3000';
 
-    // Variables globales para el estado del dashboard
-    let currentUser = null; // Almacenará el objeto user del localStorage
+    // Global variables for dashboard state
+    let currentUser = null; // Will store the user object from localStorage
     let currentUserId = null;
-    let currentPatientId = null; // ID del paciente, si el usuario es paciente
-    let currentDoctorId = null;  // ID del doctor, si el usuario es doctor
+    let currentPatientId = null; // Patient ID, if the user is a patient
+    let currentDoctorId = null;  // Doctor ID, if the user is a doctor
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
-    let allMonthlyAppointments = []; // Almacenará todas las citas del mes visible
-    let selectedDate = new Date(); // Fecha seleccionada por defecto es hoy
+    let allMonthlyAppointments = []; // Will store all appointments for the visible month
+    let selectedDate = new Date(); // Default selected date is today
 
     const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-    // Mapeo de status_id a nombres de estado
+    // Mapping of status_id to status names
     const statusMap = {
         1: 'Confirmada',
         2: 'Cancelada',
-        // Puedes añadir más si tienes otros estados
+        // You can add more if you have other statuses
     };
 
-    // --- Elementos del DOM ---
+    // --- DOM Elements ---
     const userNameElement = document.getElementById('user-name');
     const userEmailElement = document.getElementById('user-email');
     const userPhoneElement = document.getElementById('user-phone');
@@ -38,9 +38,9 @@ export async function setupDashboard() {
     const createAppointmentButton = document.getElementById('create-appointment-button');
 
 
-    // --- Funciones de Utilidad ---
+    // --- Utility Functions ---
 
-    // Función para formatear una fecha a 'YYYY-MM-DD'
+    // Function to format a date as 'YYYY-MM-DD'
     function formatDate(date) {
         const d = new Date(date);
         const year = d.getFullYear();
@@ -49,36 +49,36 @@ export async function setupDashboard() {
         return `${year}-${month}-${day}`;
     }
 
-    // Función para formatear una hora a 'HH:MM AM/PM'
+    // Function to format a time as 'HH:MM AM/PM'
     function formatTime(dateTimeString) {
-        // Asumiendo que appointment_date ya tiene la hora o que se necesita extraer de un campo de hora separado si existe.
-        // Si appointment_date es un timestamp completo, podemos formatearlo directamente.
+        // Assuming appointment_date already has the time or needs to be extracted from a separate time field if exists.
+        // If appointment_date is a full timestamp, we can format it directly.
         const d = new Date(dateTimeString);
         return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: true });
     }
 
 
-    // --- Funciones de Lógica de Negocio ---
+    // --- Business Logic Functions ---
 
     async function fetchUserData() {
         if (!currentUser || !currentUserId) {
-            console.error("fetchUserData: No se encontró currentUser o currentUserId.");
+            console.error("fetchUserData: currentUser or currentUserId not found.");
             return;
         }
 
         try {
-            // Endpoint para obtener los datos del usuario directamente de la tabla users
+            // Endpoint to get user data directly from the users table
             const response = await axios.get(`/users/${currentUserId}`);
-            const userDetails = response.data; // Esperamos { fullname, email, phone, etc. }
+            const userDetails = response.data; // Expecting { fullname, email, phone, etc. }
             userNameElement.textContent = userDetails.fullname || 'N/A';
             userEmailElement.textContent = userDetails.email || 'N/A';
             userPhoneElement.textContent = userDetails.phone || 'N/A';
         } catch (error) {
-            console.error('fetchUserData: Error al obtener datos del usuario:', error);
+            console.error('fetchUserData: Error getting user data:', error);
             if (error.response) {
-                console.error('fetchUserData: Respuesta de error del servidor:', error.response.status, error.response.data);
+                console.error('fetchUserData: Server error response:', error.response.status, error.response.data);
             } else if (error.request) {
-                console.error('fetchUserData: No se recibió respuesta del servidor.');
+                console.error('fetchUserData: No response received from server.');
             }
             userNameElement.textContent = 'Error';
             userEmailElement.textContent = 'Error';
@@ -88,11 +88,11 @@ export async function setupDashboard() {
 
     async function fetchPatientOrDoctorId() {
         if (!currentUser || !currentUserId) {
-            console.error("fetchPatientOrDoctorId: No hay currentUser para determinar el rol.");
+            console.error("fetchPatientOrDoctorId: No currentUser to determine role.");
             return;
         }
 
-        if (currentUser.role === 3) { // Paciente
+        if (currentUser.role === 3) { // Patient
             try {
                 const response = await axios.get(`/patients/user/${currentUserId}`);
                 currentPatientId = response.data.id;
@@ -109,7 +109,7 @@ export async function setupDashboard() {
                 currentDoctorId = null;
             }
         } else {
-            console.warn("fetchPatientOrDoctorId: Rol de usuario no reconocido o no aplicable para citas.");
+            console.warn("fetchPatientOrDoctorId: User role not recognized or not applicable for appointments.");
         }
     }
 
@@ -117,32 +117,32 @@ export async function setupDashboard() {
         let appointmentsEndpoint = '';
         let idToFetch = null;
 
-        if (currentUser.role === 3 && currentPatientId) { // Es paciente
+        if (currentUser.role === 3 && currentPatientId) { // Is patient
             appointmentsEndpoint = `/appointments/patient/${currentPatientId}/month/${year}/${month + 1}`;
             idToFetch = currentPatientId;
-        } else if (currentUser.role === 2 && currentDoctorId) { // Es doctor
+        } else if (currentUser.role === 2 && currentDoctorId) { // Is doctor
             appointmentsEndpoint = `/appointments/doctor/${currentDoctorId}/month/${year}/${month + 1}`;
             idToFetch = currentDoctorId;
         } else {
-            console.error("fetchMonthlyAppointments: No hay ID de paciente/doctor o rol válido para obtener citas.");
+            console.error("fetchMonthlyAppointments: No patient/doctor ID or valid role to get appointments.");
             return [];
         }
 
         try {
             const response = await axios.get(appointmentsEndpoint);
-            allMonthlyAppointments = response.data; // Guardar todas las citas del mes
+            allMonthlyAppointments = response.data; // Save all appointments for the month
 
-            // Extraer solo las fechas que tienen citas 'confirmada' (status_id = 1) para marcarlas en el calendario
+            // Extract only dates with 'confirmed' appointments (status_id = 1) to mark them on the calendar
             const appointmentDates = new Set(allMonthlyAppointments
-                .filter(app => app.status_id === 1) // Filtrar por status_id para 'confirmada'
+                .filter(app => app.status_id === 1) // Filter by status_id for 'confirmed'
                 .map(app => formatDate(app.appointment_date)));
             return Array.from(appointmentDates);
         } catch (error) {
-            console.error('fetchMonthlyAppointments: Error al obtener citas mensuales:', error);
+            console.error('fetchMonthlyAppointments: Error getting monthly appointments:', error);
             if (error.response) {
-                console.error('fetchMonthlyAppointments: Respuesta de error del servidor:', error.response.status, error.response.data);
+                console.error('fetchMonthlyAppointments: Server error response:', error.response.status, error.response.data);
             } else if (error.request) {
-                console.error('fetchMonthlyAppointments: No se recibió respuesta del servidor.');
+                console.error('fetchMonthlyAppointments: No response received from server.');
             }
             return [];
         }
@@ -150,9 +150,9 @@ export async function setupDashboard() {
 
     function renderCalendar(year, month, datesWithAppointments = []) {
         currentMonthYearElement.textContent = `${months[month]} ${year}`;
-        calendarGrid.innerHTML = ''; // Limpiar días anteriores
+        calendarGrid.innerHTML = ''; // Clear previous days
 
-        // Añadir los días de la semana
+        // Add days of the week
         const daysOfWeek = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
         daysOfWeek.forEach(day => {
             const dayHeader = document.createElement('div');
@@ -166,14 +166,14 @@ export async function setupDashboard() {
         const today = new Date();
         const todayFormatted = formatDate(today);
 
-        // Rellenar días vacíos al principio del mes
+        // Fill empty days at the beginning of the month
         for (let i = 0; i < firstDayOfMonth; i++) {
             const emptyDay = document.createElement('div');
             emptyDay.className = 'py-2 text-gray-400';
             calendarGrid.appendChild(emptyDay);
         }
 
-        // Renderizar días del mes actual
+        // Render days of the current month
         for (let day = 1; day <= daysInMonth; day++) {
             const dayElement = document.createElement('div');
             const date = new Date(year, month, day);
@@ -185,12 +185,12 @@ export async function setupDashboard() {
                 classList.push('day-with-appointment');
             }
 
-            // Si es el día de hoy, añade la clase 'today'
+            // If it's today, add the 'today' class
             if (formattedDate === todayFormatted && year === today.getFullYear() && month === today.getMonth()) {
                 classList.push('today');
             }
 
-            // Si es el día seleccionado, añade la clase 'selected'
+            // If it's the selected day, add the 'selected' class
             if (formattedDate === formatDate(selectedDate)) {
                 const todayIndex = classList.indexOf('today');
                 if (todayIndex > -1) {
@@ -201,10 +201,10 @@ export async function setupDashboard() {
 
             dayElement.className = classList.join(' ');
             dayElement.textContent = day;
-            dayElement.dataset.date = formattedDate; // Guardar la fecha completa en un atributo de datos
+            dayElement.dataset.date = formattedDate; // Save the full date in a data attribute
 
             dayElement.addEventListener('click', () => {
-                selectedDate = date; // Actualiza la fecha seleccionada globalmente
+                selectedDate = date; // Update the globally selected date
                 document.querySelectorAll('.calendar-day.selected').forEach(el => {
                     el.classList.remove('selected');
                     if (formatDate(new Date(el.dataset.date)) === todayFormatted && year === today.getFullYear() && month === today.getMonth()) {
@@ -213,7 +213,7 @@ export async function setupDashboard() {
                 });
                 dayElement.classList.add('selected');
                 dayElement.classList.remove('today');
-                displayAppointments(selectedDate); // Mostrar citas para el día seleccionado
+                displayAppointments(selectedDate); // Show appointments for the selected day
             });
             calendarGrid.appendChild(dayElement);
         }
@@ -232,8 +232,8 @@ export async function setupDashboard() {
     }
 
     function displayAppointments(date) {
-        appointmentsList.innerHTML = ''; // Limpiar citas anteriores
-        noAppointmentsMessage.classList.add('hidden'); // Ocultar el mensaje por defecto
+        appointmentsList.innerHTML = ''; // Clear previous appointments
+        noAppointmentsMessage.classList.add('hidden'); // Hide the default message
 
         selectedDateDisplay.textContent = new Date(date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         appointmentsListTitle.textContent = `Citas para el ${new Date(date).toLocaleDateString('es-ES')}`;
@@ -243,7 +243,7 @@ export async function setupDashboard() {
         const appointmentsForSelectedDay = allMonthlyAppointments.filter(app => formatDate(app.appointment_date) === formattedSelectedDate);
 
         if (appointmentsForSelectedDay.length === 0) {
-            noAppointmentsMessage.classList.remove('hidden'); // Mostrar mensaje si no hay citas
+            noAppointmentsMessage.classList.remove('hidden'); // Show message if no appointments
             return;
         }
 
@@ -252,13 +252,13 @@ export async function setupDashboard() {
             appointmentDiv.className = 'bg-gray-50 rounded-lg p-4 flex justify-between items-start';
 
             const statusName = statusMap[appointment.status_id] || 'Desconocido';
-            let statusClass = 'text-gray-700'; // Color por defecto
+            let statusClass = 'text-gray-700'; // Default color
 
             switch (appointment.status_id) {
-                case 1: // confirmada
+                case 1: // confirmed
                     statusClass = 'text-green-600';
                     break;
-                case 2: // cancelada
+                case 2: // canceled
                     statusClass = 'text-red-600';
                     break;
                 default:
@@ -268,10 +268,10 @@ export async function setupDashboard() {
             let participantName = 'N/A';
             let participantRole = '';
 
-            if (currentUser.role === 3) { // Si el usuario logeado es paciente, muestra el nombre del doctor
+            if (currentUser.role === 3) { // If the logged user is a patient, show the doctor's name
                 participantName = appointment.doctor_name || 'N/A';
                 participantRole = 'Dr.';
-            } else if (currentUser.role === 2) { // Si el usuario logeado es doctor, muestra el nombre del paciente
+            } else if (currentUser.role === 2) { // If the logged user is a doctor, show the patient's name
                 participantName = appointment.patient_name || 'N/A';
                 participantRole = 'Paciente:';
             }
@@ -289,33 +289,33 @@ export async function setupDashboard() {
     }
 
     function logout() {
-        localStorage.removeItem('current'); // Limpiar la clave 'current'
-        window.location.href = '/login'; // Redirigir a la página de login
+        localStorage.removeItem('current'); // Clear the 'current' key
+        window.location.href = '/login'; // Redirect to the login page
     }
 
-    // --- Inicialización del Dashboard ---
+    // --- Dashboard Initialization ---
     const currentStorage = localStorage.getItem('current');
     if (currentStorage) {
         currentUser = JSON.parse(currentStorage);
         currentUserId = currentUser.id;
     }
 
-    // Verificar autenticación
+    // Check authentication
     if (!currentUser || !currentUserId) {
-        console.warn("initDashboard: Objeto de usuario no encontrado en localStorage. Redirigiendo a /login.");
+        console.warn("initDashboard: User object not found in localStorage. Redirecting to /login.");
         window.location.href = '/login';
         return;
     }
 
-    // Cargar datos del usuario
+    // Load user data
     await fetchUserData();
-    // Obtener patient_id o doctor_id según el rol
+    // Get patient_id or doctor_id according to the role
     await fetchPatientOrDoctorId();
 
-    // Cargar y renderizar el calendario y las citas para el mes actual
+    // Load and render the calendar and appointments for the current month
     await updateCalendarAndAppointments();
 
-    // Asegurarse de que el día actual esté seleccionado y sus citas se muestren al cargar
+    // Make sure the current day is selected and its appointments are shown on load
     const today = new Date();
     selectedDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
