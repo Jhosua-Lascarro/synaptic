@@ -75,7 +75,7 @@ function renderCita(cita) {
               </p>
             </div>
             <span class="text-sm font-medium text-gray-700">${
-              cita.appointment_date ?? ""
+             convertDate(cita.appointment_date)
             }</span>
           </div>
         </div>
@@ -96,4 +96,15 @@ function calcularEdad(fechaNacimiento) {
   }
 
   return edad;
+}
+
+function convertDate(convertDate) {
+  return new Date(convertDate).toLocaleDateString("es-ES", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  
 }
