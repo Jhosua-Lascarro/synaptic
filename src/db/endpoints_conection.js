@@ -438,6 +438,8 @@ app.patch("/appointments/:id", async (req, res) => {
   }
   return res.status(200).json(data[0]); // Retorna el dato actualizado
 });
+
+/*este es el endpoint para llamar las citas por fecha en la vista de doctor  */
 app.get("/appointments/fecha", async (req, res) => {
   const { date } = req.query; // YYYY-MM-DD
 

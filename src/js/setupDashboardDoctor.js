@@ -3,25 +3,17 @@ import { renderCalendarWidget } from "./calendar";
 
 export function setupDashboardDoctor() {
   setTimeout(() => {
+     infoUserDoctor();
     setupOutButtonDoctor();
     renderCalendarWidget();
-    loadCitas();
-    infoUserDoctor();
+
+  
+   
   }, 0);
 }
 async function loadCitas() {
   const content = document.getElementById("content-citas");
-  try {
-    const res = await fetch("http://localhost:3000/appointments");
-    const data = await res.json();
-
-    data.forEach((cita) => {
-      content.innerHTML += render(cita);
-      console.log(cita);
-    });
-  } catch (error) {
-    console.error("no se pudo traer los datos", error);
-  }
+ 
 }
 
 function render(cita) {
