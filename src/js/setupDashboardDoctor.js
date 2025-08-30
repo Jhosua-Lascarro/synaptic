@@ -4,7 +4,7 @@ import { renderCalendarWidget } from "./calendar";
 // Function to setup the doctor's dashboard
 export function setupDashboardDoctor() {
   setTimeout(() => {
-     infoUserDoctor();
+    infoUserDoctor();
     setupOutButtonDoctor();
     renderCalendarWidget();
   }, 100);
@@ -12,18 +12,16 @@ export function setupDashboardDoctor() {
 
 // Function to setup the logout button for doctor
 export function setupOutButtonDoctor() {
-  setTimeout(() => {
-    const logout = document.getElementById("exit");
-    if (logout) {
-      logout.addEventListener("click", (e) => {
-        e.preventDefault();
-        localStorage.removeItem("current");
-        redirecto("/");
-      });
-    } else {
-      console.error("Element with id 'exit' not found");
-    }
-  }, 0);
+  const logout = document.getElementById("exit");
+  if (logout) {
+    logout.addEventListener("click", (e) => {
+      e.preventDefault();
+      localStorage.removeItem("current");
+      redirecto("/");
+    });
+  } else {
+    console.error("Element with id 'exit' not found");
+  }
 }
 
 // Function to display doctor's user info
