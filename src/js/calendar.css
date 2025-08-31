@@ -1,6 +1,6 @@
-/* Contenedor minimalista y responsivo */
+/* Minimalist and responsive container */
 #calendar {
-  max-width: 350px;      /* pequeño y controlado */
+  max-width: 350px;      /* litle and controlate */
   margin:  auto;
   background: #fff;
   border-radius: 12px;
@@ -16,13 +16,13 @@
   box-shadow: 0 4px 20px rgba(166, 17, 17, 0.12);
 }
 
-/* Estilo limpio para las celdas */
+/* styke clean for cells */
 .fc-daygrid-day {
   border: none !important;
   font-size: 0.8rem;
 }
 
-/* Días */
+/* Days */
 .fc-daygrid-day-number {
   font-weight: 500;
   color: #857a7a;
@@ -36,7 +36,7 @@
   background: #f0f0f0;
 }
 
-/* Eventos minimalistas */
+/* Events minimalists */
 .fc-event {
   background: #007bff;
   border: none;
@@ -46,7 +46,7 @@
   text-align: center;
 }
 
-/* Responsivo */
+/* Responsive */
 @media (max-width: 600px) {
   #calendar {
     max-width: 100%;
