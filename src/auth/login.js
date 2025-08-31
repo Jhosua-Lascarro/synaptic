@@ -2,7 +2,7 @@ const userURL = "http://localhost:3000";
 
  export async function login({ email, password }) {
   const form = document.getElementById("loginForm");
-
+// create event for login 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = document.getElementById("email").value;
@@ -31,7 +31,7 @@ const userURL = "http://localhost:3000";
     } catch (error) {
       console.log(error);
       alert("ocurrió un error inesperado");
-    }
+    } // redirects to home
     if (login) {
       location.href = "/";
       }
