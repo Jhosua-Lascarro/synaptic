@@ -66,30 +66,44 @@ async function loadCitas(citas) {
 function renderCita(cita) {
   const nombre = cita.patiens.users.fullname;
   const fechaNacimiento = cita.patiens.users.birthdate;
+
+  // --- Crear objeto Date a partir del campo appointment_date ---
+  // Si viene como "YYYY-MM-DD HH:MM:SS", lo convertimos a ISO válido
+  const fechaRaw = String(cita.appointment_date).trim();
+  const fechaIso = fechaRaw.includes("T") ? fechaRaw : fechaRaw.replace(" ", "T");
+  const fechaObj = new Date(fechaIso);
+
+  // --- Formatear fecha y hora (ej: 31 de agosto de 2025, 14:27) ---
+  const fechaHora = !isNaN(fechaObj.getTime())
+    ? fechaObj.toLocaleString("es-ES", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false, // formato 24h
+      })
+    : "Fecha no disponible";
+
   return `
     <div class="flex-1 p-0.5">
-      <div class="bg-white rounded-lg border border-gray-200 p-6">
+      <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm hover:shadow-md transition">
         <h2 class="text-lg font-semibold text-gray-800 mb-4">Appointment</h2>
         <div class="space-y-4">
           <div class="bg-gray-50 rounded-lg p-4 flex justify-between items-start">
             <div>
-              <h3 class="font-medium text-gray-800">Consulta: ${
-                cita.reason
-              }</h3>
+              <h3 class="font-medium text-gray-800">Consulta: ${cita.reason}</h3>
               <p class="text-sm text-gray-600 mt-1">Paciente: ${nombre}</p>
-              <p class="text-sm text-gray-600">Años: ${calcularEdad(
-                fechaNacimiento
-              )}</p>
+              <p class="text-sm text-gray-600">Edad: ${calcularEdad(fechaNacimiento)} años</p>
             </div>
-            <span class="text-sm font-medium text-gray-700">${convertDate(
-              cita.appointment_date
-            )}</span>
+            <span class="text-sm font-medium text-gray-700">${fechaHora}</span>
           </div>
         </div>
       </div>
     </div>
   `;
 }
+
 
 function calcularEdad(fechaNacimiento) {
   const hoy = new Date();
