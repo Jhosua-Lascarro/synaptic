@@ -1,28 +1,24 @@
 import axios from 'axios';
 
-// Base Axios configuration to avoid repeating the base URL
 export async function setupDashboard() {
     axios.defaults.baseURL = 'http://localhost:3000';
 
-    // Global variables for dashboard state
-    let currentUser = null; // Will store the user object from localStorage
+    // --- Estado global ---
+    let currentUser = null;
     let currentUserId = null;
-    let currentPatientId = null; // Patient ID, if the user is a patient
-    let currentDoctorId = null;  // Doctor ID, if the user is a doctor
+    let currentPatientId = null;
+    let currentDoctorId = null;
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
-    let allMonthlyAppointments = []; // Will store all appointments for the visible month
-    let selectedDate = new Date(); // Default selected date is today
+    let allMonthlyAppointments = [];
+    let selectedDate = new Date();
 
-    const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-    // Mapping of status_id to status names
-    const statusMap = {
-        1: 'Confirmada',
-        2: 'Cancelada',
-        // You can add more if you have other statuses
-    };
+    const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
-    // --- DOM Elements ---
+    const statusMap = { 1: 'Confirmada', 2: 'Cancelada' };
+
+    // --- Elementos del DOM ---
     const userNameElement = document.getElementById('user-name');
     const userEmailElement = document.getElementById('user-email');
     const userPhoneElement = document.getElementById('user-phone');
@@ -37,10 +33,13 @@ export async function setupDashboard() {
     const appointmentsListTitle = document.getElementById('appointments-list-title');
     const createAppointmentButton = document.getElementById('create-appointment-button');
 
+    // 🔹 Modal
+    const appointmentModal = document.getElementById('appointment-modal');
+    const appointmentForm = document.getElementById('appointment-form');
+    const doctorSelect = document.getElementById('doctor-select');
+    const closeModalBtn = document.getElementById('close-modal-btn');
 
-    // --- Utility Functions ---
-
-    // Function to format a date as 'YYYY-MM-DD'
+    // --- Utilidades ---
     function formatDate(date) {
         const d = new Date(date);
         const year = d.getFullYear();
@@ -49,56 +48,35 @@ export async function setupDashboard() {
         return `${year}-${month}-${day}`;
     }
 
-    // Function to format a time as 'HH:MM AM/PM'
     function formatTime(dateTimeString) {
-        // Assuming appointment_date already has the time or needs to be extracted from a separate time field if exists.
-        // If appointment_date is a full timestamp, we can format it directly.
         const d = new Date(dateTimeString);
-        return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: true });
+        return d.toLocaleTimeString('es-ES',
+            { hour: '2-digit', minute: '2-digit', hour12: true });
     }
 
-
-    // --- Business Logic Functions ---
-
+    // --- API ---
     async function fetchUserData() {
-        if (!currentUser || !currentUserId) {
-            console.error("fetchUserData: currentUser or currentUserId not found.");
-            return;
-        }
-
+        if (!currentUserId) return;
         try {
-            // Endpoint to get user data directly from the users table
             const response = await axios.get(`/users/${currentUserId}`);
-            const userDetails = response.data; // Expecting { fullname, email, phone, etc. }
+            const userDetails = response.data;
             userNameElement.textContent = userDetails.fullname || 'N/A';
             userEmailElement.textContent = userDetails.email || 'N/A';
-            userPhoneElement.textContent = userDetails.phone || 'N/A';
+            userPhoneElement.textContent = userDetails.phone || 'No disponible';
         } catch (error) {
-            console.error('fetchUserData: Error getting user data:', error);
-            if (error.response) {
-                console.error('fetchUserData: Server error response:', error.response.status, error.response.data);
-            } else if (error.request) {
-                console.error('fetchUserData: No response received from server.');
-            }
-            userNameElement.textContent = 'Error';
-            userEmailElement.textContent = 'Error';
-            userPhoneElement.textContent = 'Error';
+            console.error('fetchUserData:', error);
         }
     }
 
     async function fetchPatientOrDoctorId() {
-        if (!currentUser || !currentUserId) {
-            console.error("fetchPatientOrDoctorId: No currentUser to determine role.");
-            return;
-        }
+        if (!currentUser || !currentUserId) return;
 
-        if (currentUser.role === 3) { // Patient
+        if (currentUser.role === 3) { // Paciente
             try {
                 const response = await axios.get(`/patients/user/${currentUserId}`);
                 currentPatientId = response.data.id;
             } catch (error) {
                 console.error('Error fetching patient ID:', error);
-                currentPatientId = null;
             }
         } else if (currentUser.role === 2) { // Doctor
             try {
@@ -106,242 +84,244 @@ export async function setupDashboard() {
                 currentDoctorId = response.data.id;
             } catch (error) {
                 console.error('Error fetching doctor ID:', error);
-                currentDoctorId = null;
             }
-        } else {
-            console.warn("fetchPatientOrDoctorId: User role not recognized or not applicable for appointments.");
         }
     }
 
     async function fetchMonthlyAppointments(year, month) {
-        let appointmentsEndpoint = '';
-        let idToFetch = null;
-
-        if (currentUser.role === 3 && currentPatientId) { // Is patient
-            appointmentsEndpoint = `/appointments/patient/${currentPatientId}/month/${year}/${month + 1}`;
-            idToFetch = currentPatientId;
-        } else if (currentUser.role === 2 && currentDoctorId) { // Is doctor
-            appointmentsEndpoint = `/appointments/doctor/${currentDoctorId}/month/${year}/${month + 1}`;
-            idToFetch = currentDoctorId;
+        let endpoint = '';
+        if (currentUser.role === 3 && currentPatientId) {
+            endpoint = `/appointments/patient/${currentPatientId}/month/${year}/${month + 1}`;
+        } else if (currentUser.role === 2 && currentDoctorId) {
+            endpoint = `/appointments/doctor/${currentDoctorId}/month/${year}/${month + 1}`;
         } else {
-            console.error("fetchMonthlyAppointments: No patient/doctor ID or valid role to get appointments.");
             return [];
         }
 
         try {
-            const response = await axios.get(appointmentsEndpoint);
-            allMonthlyAppointments = response.data; // Save all appointments for the month
+            const response = await axios.get(endpoint);
+            allMonthlyAppointments = response.data;
 
-            // Extract only dates with 'confirmed' appointments (status_id = 1) to mark them on the calendar
-            const appointmentDates = new Set(allMonthlyAppointments
-                .filter(app => app.status_id === 1) // Filter by status_id for 'confirmed'
-                .map(app => formatDate(app.appointment_date)));
+            // Solo citas confirmadas se marcan en el calendario
+            const appointmentDates = new Set(
+                allMonthlyAppointments.filter(a => a.status_id === 1)
+                    .map(a => formatDate(a.appointment_date))
+            );
             return Array.from(appointmentDates);
         } catch (error) {
-            console.error('fetchMonthlyAppointments: Error getting monthly appointments:', error);
-            if (error.response) {
-                console.error('fetchMonthlyAppointments: Server error response:', error.response.status, error.response.data);
-            } else if (error.request) {
-                console.error('fetchMonthlyAppointments: No response received from server.');
-            }
+            console.error('fetchMonthlyAppointments:', error);
+            allMonthlyAppointments = [];
             return [];
         }
     }
 
+    async function loadDoctors() {
+        try {
+            const resp = await axios.get("/doctors/summary");
+            const doctors = resp.data || [];
+
+            if (!Array.isArray(doctors) || doctors.length === 0) {
+                doctorSelect.innerHTML = `<option value="">No hay doctores disponibles</option>`;
+                return;
+            }
+
+            doctorSelect.innerHTML = doctors
+                .map((d) => {
+                    const labelParts = [];
+                    labelParts.push(d.fullname || `Doctor #${d.id}`);
+                    if (d.primary_specialty) labelParts.push(`– ${d.primary_specialty}`);
+                    return `<option value="${d.id}">${labelParts.join(" ")}</option>`;
+                })
+                .join("");
+        } catch (error) {
+            console.error("Error cargando doctores:", error);
+            doctorSelect.innerHTML = `<option value="">Error cargando doctores</option>`;
+        }
+    }
+
+    async function createAppointment(formData) {
+        const date = formData.get('date');
+        const time = formData.get('time');
+        const appointmentDateTime = `${date} ${time}:00`;
+
+        const newAppointment = {
+            patient_id: currentPatientId,
+            doctor_id: formData.get('doctor'),
+            appointment_date: appointmentDateTime,
+            status_id: 1,
+            reason: formData.get('reason'),
+            notes: formData.get('notes') || null
+        };
+
+        try {
+            await axios.post("/appointments", newAppointment);
+            alert("Cita creada con éxito");
+            closeModal();
+            appointmentForm.reset();
+            await updateCalendarAndAppointments();
+        } catch (error) {
+            console.error("Error creando cita:", error);
+            alert("Error al crear la cita");
+        }
+    }
+
+    async function updateAppointmentStatus(id, newStatus) {
+        try {
+            await axios.patch(`/appointments/${id}`, { status_id: newStatus });
+            await updateCalendarAndAppointments();
+        } catch (error) {
+            console.error("Error actualizando estado:", error);
+            alert("No se pudo actualizar el estado");
+        }
+    }
+
+    // --- UI ---
     function renderCalendar(year, month, datesWithAppointments = []) {
         currentMonthYearElement.textContent = `${months[month]} ${year}`;
-        calendarGrid.innerHTML = ''; // Clear previous days
+        calendarGrid.innerHTML = '';
 
-        // Add days of the week
         const daysOfWeek = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
         daysOfWeek.forEach(day => {
-            const dayHeader = document.createElement('div');
-            dayHeader.className = 'font-medium text-gray-500 py-2';
-            dayHeader.textContent = day;
-            calendarGrid.appendChild(dayHeader);
+            const el = document.createElement('div');
+            el.className = 'font-medium text-gray-500 py-2 text-sm';
+            el.textContent = day;
+            calendarGrid.appendChild(el);
         });
 
-        const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 = Sunday, 1 = Monday, etc.
+        const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const today = new Date();
-        const todayFormatted = formatDate(today);
+        const todayFormatted = formatDate(new Date());
 
-        // Fill empty days at the beginning of the month
-        for (let i = 0; i < firstDayOfMonth; i++) {
-            const emptyDay = document.createElement('div');
-            emptyDay.className = 'py-2 text-gray-400';
-            calendarGrid.appendChild(emptyDay);
-        }
+        for (let i = 0; i < firstDay; i++) calendarGrid.appendChild(document.createElement('div'));
 
-        // Render days of the current month
         for (let day = 1; day <= daysInMonth; day++) {
-            const dayElement = document.createElement('div');
             const date = new Date(year, month, day);
             const formattedDate = formatDate(date);
-
-            let classList = ['calendar-day'];
-
-            if (datesWithAppointments.includes(formattedDate)) {
-                classList.push('day-with-appointment');
-            }
-
-            // If it's today, add the 'today' class
-            if (formattedDate === todayFormatted && year === today.getFullYear() && month === today.getMonth()) {
-                classList.push('today');
-            }
-
-            // If it's the selected day, add the 'selected' class
-            if (formattedDate === formatDate(selectedDate)) {
-                const todayIndex = classList.indexOf('today');
-                if (todayIndex > -1) {
-                    classList.splice(todayIndex, 1);
-                }
-                classList.push('selected');
-            }
-
-            dayElement.className = classList.join(' ');
-            dayElement.textContent = day;
-            dayElement.dataset.date = formattedDate; // Save the full date in a data attribute
-
-            dayElement.addEventListener('click', () => {
-                selectedDate = date; // Update the globally selected date
-                document.querySelectorAll('.calendar-day.selected').forEach(el => {
-                    el.classList.remove('selected');
-                    if (formatDate(new Date(el.dataset.date)) === todayFormatted && year === today.getFullYear() && month === today.getMonth()) {
-                        el.classList.add('today');
-                    }
-                });
-                dayElement.classList.add('selected');
-                dayElement.classList.remove('today');
-                displayAppointments(selectedDate); // Show appointments for the selected day
+            const el = document.createElement('div');
+            el.className = 'calendar-day';
+            if (datesWithAppointments.includes(formattedDate)) el.classList.add('day-with-appointment');
+            if (formattedDate === todayFormatted) el.classList.add('today');
+            if (formattedDate === formatDate(selectedDate)) el.classList.add('selected');
+            el.textContent = day;
+            el.dataset.date = formattedDate;
+            el.addEventListener('click', () => {
+                selectedDate = date;
+                renderCalendar(year, month, datesWithAppointments);
+                displayAppointments(selectedDate);
             });
-            calendarGrid.appendChild(dayElement);
-        }
-
-        const selectedDayElement = document.querySelector(`.calendar-day[data-date="${formatDate(selectedDate)}"]`);
-        if (selectedDayElement) {
-            selectedDayElement.classList.remove('today');
-            selectedDayElement.classList.add('selected');
+            calendarGrid.appendChild(el);
         }
     }
 
     async function updateCalendarAndAppointments() {
-        const datesWithAppointments = await fetchMonthlyAppointments(currentYear, currentMonth);
-        renderCalendar(currentYear, currentMonth, datesWithAppointments);
+        const dates = await fetchMonthlyAppointments(currentYear, currentMonth);
+        renderCalendar(currentYear, currentMonth, dates);
         displayAppointments(selectedDate);
     }
 
     function displayAppointments(date) {
-        appointmentsList.innerHTML = ''; // Clear previous appointments
-        noAppointmentsMessage.classList.add('hidden'); // Hide the default message
+        appointmentsList.innerHTML = '';
+        noAppointmentsMessage.classList.add('hidden');
+        appointmentsList.classList.remove('hidden');
 
-        selectedDateDisplay.textContent = new Date(date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        appointmentsListTitle.textContent = `Citas para el ${new Date(date).toLocaleDateString('es-ES')}`;
+        const dateString = new Date(date).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+        selectedDateDisplay.textContent = `el ${dateString}`;
+        appointmentsListTitle.textContent = `Citas del ${dateString}`;
 
+        const formattedDate = formatDate(date);
+        const apps = allMonthlyAppointments.filter(a => formatDate(a.appointment_date) === formattedDate);
 
-        const formattedSelectedDate = formatDate(date);
-        const appointmentsForSelectedDay = allMonthlyAppointments.filter(app => formatDate(app.appointment_date) === formattedSelectedDate);
-
-        if (appointmentsForSelectedDay.length === 0) {
-            noAppointmentsMessage.classList.remove('hidden'); // Show message if no appointments
+        if (apps.length === 0) {
+            noAppointmentsMessage.classList.remove('hidden');
+            appointmentsList.classList.add('hidden');
             return;
         }
 
-        appointmentsForSelectedDay.forEach(appointment => {
-            const appointmentDiv = document.createElement('div');
-            appointmentDiv.className = 'bg-gray-50 rounded-lg p-4 flex justify-between items-start';
+        apps.sort((a, b) => new Date(a.appointment_date) - new Date(b.appointment_date));
 
-            const statusName = statusMap[appointment.status_id] || 'Desconocido';
-            let statusClass = 'text-gray-700'; // Default color
+        apps.forEach(app => {
+            const div = document.createElement('div');
+            div.className = `rounded-lg p-4 border mb-2 ${app.status_id === 2
+                ? 'bg-gray-100 border-gray-300 text-gray-500'
+                : 'bg-white border-gray-200'}`;
 
-            switch (appointment.status_id) {
-                case 1: // confirmed
-                    statusClass = 'text-green-600';
-                    break;
-                case 2: // canceled
-                    statusClass = 'text-red-600';
-                    break;
-                default:
-                    statusClass = 'text-gray-700';
-            }
+            const participantName = currentUser.role === 3 ? app.doctor_name : app.patient_name;
+            const participantRole = currentUser.role === 3 ? 'Dr.' : 'Paciente:';
 
-            let participantName = 'N/A';
-            let participantRole = '';
-
-            if (currentUser.role === 3) { // If the logged user is a patient, show the doctor's name
-                participantName = appointment.doctor_name || 'N/A';
-                participantRole = 'Dr.';
-            } else if (currentUser.role === 2) { // If the logged user is a doctor, show the patient's name
-                participantName = appointment.patient_name || 'N/A';
-                participantRole = 'Paciente:';
-            }
-
-            appointmentDiv.innerHTML = `
-                <div>
-                    <h3 class="font-medium text-gray-800">${participantRole} ${participantName} - <span class="${statusClass}">${statusName}</span></h3>
-                    <p class="text-sm text-gray-600 mt-1">Motivo: ${appointment.reason || 'N/A'}</p>
-                    <p class="text-sm text-gray-600">Fecha/Hora: ${formatTime(appointment.appointment_date)}</p>
+            div.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <p class="font-bold text-blue-600">${formatTime(app.appointment_date)}</p>
+                    <select class="status-select border rounded p-1 text-sm" data-id="${app.id}">
+                        <option value="1" ${app.status_id === 1 ? 'selected' : ''}>Confirmada</option>
+                        <option value="2" ${app.status_id === 2 ? 'selected' : ''}>Cancelada</option>
+                    </select>
                 </div>
-                <span class="text-sm font-medium ${statusClass}">${statusName}</span>
+                <div class="mt-2">
+                    <h3 class="font-semibold text-gray-800">${participantRole} ${participantName}</h3>
+                    <p class="text-sm">Motivo: ${app.reason || 'No especificado'}</p>
+                </div>
             `;
-            appointmentsList.appendChild(appointmentDiv);
+
+            appointmentsList.appendChild(div);
+        });
+
+        // Escuchar cambios en los selects de estado
+        document.querySelectorAll(".status-select").forEach(select => {
+            select.addEventListener("change", (e) => {
+                const appointmentId = e.target.dataset.id;
+                const newStatus = parseInt(e.target.value);
+                updateAppointmentStatus(appointmentId, newStatus);
+            });
         });
     }
 
     function logout() {
-        localStorage.removeItem('current'); // Clear the 'current' key
-        window.location.href = '/login'; // Redirect to the login page
+        localStorage.removeItem('current');
+        window.location.href = '/';
     }
 
-    // --- Dashboard Initialization ---
+    function openModal() {
+        appointmentModal.classList.remove('hidden');
+        loadDoctors();
+    }
+
+    function closeModal() {
+        appointmentModal.classList.add('hidden');
+    }
+
+    // --- Inicialización ---
     const currentStorage = localStorage.getItem('current');
     if (currentStorage) {
         currentUser = JSON.parse(currentStorage);
         currentUserId = currentUser.id;
     }
+    if (!currentUser || !currentUserId) return;
 
-    // Check authentication
-    if (!currentUser || !currentUserId) {
-        console.warn("initDashboard: User object not found in localStorage. Redirecting to /login.");
-        window.location.href = '/login';
-        return;
-    }
-
-    // Load user data
     await fetchUserData();
-    // Get patient_id or doctor_id according to the role
     await fetchPatientOrDoctorId();
+    selectedDate = new Date();
 
-    // Load and render the calendar and appointments for the current month
     await updateCalendarAndAppointments();
 
-    // Make sure the current day is selected and its appointments are shown on load
-    const today = new Date();
-    selectedDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
-
-    // --- Event Listeners ---
+    // --- Eventos ---
     logoutButton.addEventListener('click', logout);
-
     prevMonthBtn.addEventListener('click', () => {
         currentMonth--;
-        if (currentMonth < 0) {
-            currentMonth = 11;
-            currentYear--;
-        }
+        if (currentMonth < 0) { currentMonth = 11; currentYear--; }
         updateCalendarAndAppointments();
     });
-
     nextMonthBtn.addEventListener('click', () => {
         currentMonth++;
-        if (currentMonth > 11) {
-            currentMonth = 0;
-            currentYear++;
-        }
+        if (currentMonth > 11) { currentMonth = 0; currentYear++; }
         updateCalendarAndAppointments();
     });
 
-    createAppointmentButton.addEventListener('click', () => {
-        alert('Funcionalidad para crear cita próximamente.');
-    });
+    if (currentUser.role === 3) {
+        createAppointmentButton.addEventListener('click', openModal);
+        closeModalBtn.addEventListener('click', closeModal);
+        appointmentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await createAppointment(new FormData(appointmentForm));
+        });
+    }
 }

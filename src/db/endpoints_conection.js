@@ -345,7 +345,7 @@ app.post("/appointments", async (req, res) => {
   const { patient_id, doctor_id, appointment_date, status_id, reason, notes } =
     req.body;
 
-  // Verify if the patient exists
+  // Verificar paciente
   const { data: patientData, error: errorPatient } = await supabase
     .from("patiens")
     .select("id")
@@ -360,7 +360,7 @@ app.post("/appointments", async (req, res) => {
     return res.status(404).json({ error: "patient not found" });
   }
 
-  // Verify if the doctor exists
+  // Verificar doctor
   const { data: doctorData, error: errorDoctor } = await supabase
     .from("doctors")
     .select("id")
@@ -472,19 +472,17 @@ app.get("/appointments/fecha", async (req, res) => {
 });
 
 // Get patient appointments for a specific month and year (for dashboard)
-app.get(
-  "/appointments/patient/:patientId/month/:year/:month",
-  async (req, res) => {
-    try {
-      const { patientId, year, month } = req.params;
+app.get("/appointments/patient/:patientId/month/:year/:month", async (req, res) => {
+  try {
+    const { patientId, year, month } = req.params;
 
-      const startDate = new Date(year, month - 1, 1).toISOString();
-      const endDate = new Date(year, month, 0, 23, 59, 59, 999).toISOString();
+    const startDate = new Date(year, month - 1, 1).toISOString();
+    const endDate = new Date(year, month, 0, 23, 59, 59, 999).toISOString();
 
-      const { data: appointments, error } = await supabase
-        .from("appointments")
-        .select(
-          `
+    const { data: appointments, error } = await supabase
+      .from("appointments")
+      .select(
+        `
                 id,
                 patient_id,
                 doctor_id,
@@ -496,63 +494,61 @@ app.get(
                 doctors ( users ( fullname ) ),
                 patiens ( users ( fullname ) )
             `
-        )
-        .eq("patient_id", patientId)
-        .gte("appointment_date", startDate)
-        .lte("appointment_date", endDate)
-        .order("appointment_date", { ascending: true });
+      )
+      .eq("patient_id", patientId)
+      .gte("appointment_date", startDate)
+      .lte("appointment_date", endDate)
+      .order("appointment_date", { ascending: true });
 
-      if (error) {
-        console.error(
-          "Error fetching patient appointments for month:",
-          error.message
-        );
-        return res.status(500).json({
-          message: "Internal server error getting patient appointments.",
-        });
-      }
-
-      // Flatten the response structure for easier frontend consumption
-      const formattedAppointments = appointments.map((app) => ({
-        id: app.id,
-        patient_id: app.patient_id,
-        doctor_id: app.doctor_id,
-        appointment_date: app.appointment_date,
-        status_id: app.status_id,
-        reason: app.reason,
-        notes: app.notes,
-        status_name: app.status?.name,
-        doctor_name: app.doctors?.users?.fullname,
-        patient_name: app.patiens?.users?.fullname,
-      }));
-
-      res.status(200).json(formattedAppointments);
-    } catch (error) {
+    if (error) {
       console.error(
-        "Error getting monthly patient appointments:",
+        "Error fetching patient appointments for month:",
         error.message
       );
-      res.status(500).json({
+      return res.status(500).json({
         message: "Internal server error getting patient appointments.",
       });
     }
+
+    // Flatten the response structure for easier frontend consumption
+    const formattedAppointments = appointments.map((app) => ({
+      id: app.id,
+      patient_id: app.patient_id,
+      doctor_id: app.doctor_id,
+      appointment_date: app.appointment_date,
+      status_id: app.status_id,
+      reason: app.reason,
+      notes: app.notes,
+      status_name: app.status?.name,
+      doctor_name: app.doctors?.users?.fullname,
+      patient_name: app.patiens?.users?.fullname,
+    }));
+
+    res.status(200).json(formattedAppointments);
+  } catch (error) {
+    console.error(
+      "Error getting monthly patient appointments:",
+      error.message
+    );
+    res.status(500).json({
+      message: "Internal server error getting patient appointments.",
+    });
   }
+}
 );
 
 // Get doctor appointments for a specific month and year (for dashboard)
-app.get(
-  "/appointments/doctor/:doctorId/month/:year/:month",
-  async (req, res) => {
-    try {
-      const { doctorId, year, month } = req.params;
+app.get("/appointments/doctor/:doctorId/month/:year/:month", async (req, res) => {
+  try {
+    const { doctorId, year, month } = req.params;
 
-      const startDate = new Date(year, month - 1, 1).toISOString();
-      const endDate = new Date(year, month, 0, 23, 59, 59, 999).toISOString();
+    const startDate = new Date(year, month - 1, 1).toISOString();
+    const endDate = new Date(year, month, 0, 23, 59, 59, 999).toISOString();
 
-      const { data: appointments, error } = await supabase
-        .from("appointments")
-        .select(
-          `
+    const { data: appointments, error } = await supabase
+      .from("appointments")
+      .select(
+        `
                 id,
                 patient_id,
                 doctor_id,
@@ -564,57 +560,57 @@ app.get(
                 doctors ( users ( fullname ) ),
                 patiens ( users ( fullname ) )
             `
-        )
-        .eq("doctor_id", doctorId)
-        .gte("appointment_date", startDate)
-        .lte("appointment_date", endDate)
-        .order("appointment_date", { ascending: true });
+      )
+      .eq("doctor_id", doctorId)
+      .gte("appointment_date", startDate)
+      .lte("appointment_date", endDate)
+      .order("appointment_date", { ascending: true });
 
-      if (error) {
-        console.error(
-          "Error fetching doctor appointments for month:",
-          error.message
-        );
-        return res.status(500).json({
-          message: "Internal server error getting doctor appointments.",
-        });
-      }
-
-      // Flatten the response structure for easier frontend consumption
-      const formattedAppointments = appointments.map((app) => ({
-        id: app.id,
-        patient_id: app.patient_id,
-        doctor_id: app.doctor_id,
-        appointment_date: app.appointment_date,
-        status_id: app.status_id,
-        reason: app.reason,
-        notes: app.notes,
-        status_name: app.status?.name,
-        doctor_name: app.doctors?.users?.fullname,
-        patient_name: app.patiens?.users?.fullname,
-      }));
-
-      res.status(200).json(formattedAppointments);
-    } catch (error) {
+    if (error) {
       console.error(
-        "Error getting monthly doctor appointments:",
+        "Error fetching doctor appointments for month:",
         error.message
       );
-      res.status(500).json({
+      return res.status(500).json({
         message: "Internal server error getting doctor appointments.",
       });
     }
+
+    // Flatten the response structure for easier frontend consumption
+    const formattedAppointments = appointments.map((app) => ({
+      id: app.id,
+      patient_id: app.patient_id,
+      doctor_id: app.doctor_id,
+      appointment_date: app.appointment_date,
+      status_id: app.status_id,
+      reason: app.reason,
+      notes: app.notes,
+      status_name: app.status?.name,
+      doctor_name: app.doctors?.users?.fullname,
+      patient_name: app.patiens?.users?.fullname,
+    }));
+
+    res.status(200).json(formattedAppointments);
+  } catch (error) {
+    console.error(
+      "Error getting monthly doctor appointments:",
+      error.message
+    );
+    res.status(500).json({
+      message: "Internal server error getting doctor appointments.",
+    });
   }
+}
 );
 
 // Authentication login to open dashboard
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  // Find user
+  // Buscar usuario
   const { data: users, error } = await supabase
     .from("users")
-    .select("id, email, fullname, password_hash, role,identification")
+    .select("id, email, fullname, password_hash, role, identification")
     .eq("email", email)
     .single();
 
@@ -631,12 +627,13 @@ app.post("/login", async (req, res) => {
   if (!match) {
     return res.status(401).json({ error: "Invalid user or password" });
   }
+
   const userSafe = {
     id: users.id,
     email: users.email,
     fullname: users.fullname,
     role: users.role,
-    identification:users.identification
+    identification: users.identification,
   };
 
   res.json({ message: "Login successful", users: userSafe });
@@ -746,6 +743,58 @@ app.get("/appointments/fecha", async (req, res) => {
 
   res.json(formattedAppointments);
 });
+
+// GET doctors with fullname and specialties
+app.get("/doctors/summary", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("doctors")
+      .select(`
+        id,
+        user_id,
+        years_expirence,
+        users:users!doctors_user_id_fkey (
+          fullname,
+          email,
+          phone
+        ),
+        doctor_specialties (
+          specialties (
+            id,
+            name
+          )
+        )
+      `);
+
+    if (error) {
+      console.error("Error fetching doctors summary:", error.message);
+      return res.status(500).json({ error: error.message });
+    }
+
+    const mapped = (data || []).map((d) => {
+      const specialties =
+        (d.doctor_specialties || [])
+          .map((ds) => ds.specialties?.name)
+          .filter(Boolean);
+
+      return {
+        id: d.id,
+        fullname: d.users?.fullname || "Sin nombre",
+        email: d.users?.email || null,
+        phone: d.users?.phone || null,
+        years_expirence: d.years_expirence || 0,
+        specialties, // Name arrays
+        primary_specialty: specialties?.[0] || null,
+      };
+    });
+
+    return res.json(mapped);
+  } catch (err) {
+    console.error("Unexpected error on /doctors/summary:", err);
+    return res.status(500).json({ error: "Unexpected error" });
+  }
+});
+
 
 // Start the server
 const PORT = process.env.PORT || 3000;

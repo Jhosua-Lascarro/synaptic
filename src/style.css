@@ -1,1 +1,18 @@
 @import "tailwindcss";
+
+.calendar-day {
+  @apply relative cursor-pointer rounded-lg p-2 hover:bg-gray-100 transition;
+}
+
+.calendar-day.day-with-appointment::after {
+  content: '';
+  @apply absolute bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-red-500 rounded-full;
+}
+
+.calendar-day.today {
+  @apply border border-blue-500 font-bold;
+}
+
+.calendar-day.selected {
+  @apply bg-blue-100;
+}

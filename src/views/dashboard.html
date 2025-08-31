@@ -143,5 +143,58 @@
                 </div>
             </div>
         </div>
+        <!-- Modal -->
+        <div id="appointment-modal"
+            class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
+
+                <!-- Encabezado -->
+                <div class="flex justify-between items-center border-b pb-3 mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Agendar Cita</h2>
+                    <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800 text-lg">&times;</button>
+                </div>
+
+                <!-- Formulario -->
+                <form id="appointment-form" class="space-y-4">
+                    <!-- Doctor -->
+                    <div>
+                        <label for="doctor" class="block text-sm font-medium text-gray-700">Doctor</label>
+                        <select id="doctor-select" name="doctor"
+                            class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                            <option value="">Selecciona un doctor</option>
+                        </select>
+                    </div>
+
+                    <!-- Fecha -->
+                    <div>
+                        <label for="date" class="block text-sm font-medium text-gray-700">Fecha</label>
+                        <input type="date" id="date" name="date"
+                            class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                    </div>
+
+                    <!-- Hora -->
+                    <div>
+                        <label for="time" class="block text-sm font-medium text-gray-700">Hora</label>
+                        <input type="time" id="time" name="time"
+                            class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                    </div>
+
+                    <!-- Motivo -->
+                    <div>
+                        <label for="reason" class="block text-sm font-medium text-gray-700">Motivo</label>
+                        <textarea id="reason" name="reason" rows="3"
+                            class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"></textarea>
+                    </div>
+
+                    <!-- Botón -->
+                    <div class="pt-2">
+                        <button type="submit"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg shadow">
+                            Guardar Cita
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </body>

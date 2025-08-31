@@ -1,4 +1,7 @@
 import { registerPost } from "@/auth/registerApi";
+import axios from "axios";
+
+const API_PATIENTS = "http://localhost:3000/patiens";
 
 // Function to setup register event listener
 export async function setupRegister() {
@@ -8,7 +11,9 @@ export async function setupRegister() {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     try {
-      // Get values from the form fields
+      // -----------------------------
+      // ORIGINAL LOGIC
+      // -----------------------------
       const fullname = document.getElementById("fullname").value;
       const email = document.getElementById("email").value;
       const identification = document.getElementById("identification").value;
@@ -20,31 +25,37 @@ export async function setupRegister() {
       const password = document.getElementById("password").value;
       const confirm = document.getElementById("confirm-password").value;
 
-      // Check if passwords match
       if (password !== confirm) {
         return alert("No coinciden las contraseñas");
       }
-      // Create new user object
+
       const newuser = {
-        fullname: fullname,
+        fullname,
         emailInput: email,
-        identification: identification,
-        phone: phone,
-        birthdate: birthdate,
+        identification,
+        phone,
+        birthdate,
         sexo: gender,
         password_hash: password,
         role: 3,
       };
 
-      // Send registration data to API
-      const data = await registerPost(newuser);
-      // if registration is successful, redirect to login
-      if (data) {
-        alert("Registro exitoso, por favor inicia sesión.");
-        window.location.href = "/";
-      }
+      // Register user
+      const resp = await registerPost(newuser);
+
+      // -----------------------------
+      // NEW LOGIC (CREATE PACIENT)
+
+      //const user = resp.data.user;
+
+      //if (user && user.role === 3) {
+      //  await axios.post(API_PATIENTS, { user_id: user.id });
+      //}
+      // -----------------------------
+
+      alert("Registro exitoso, por favor inicia sesión.");
+      window.location.href = "/";
     } catch (error) {
-      // Handle registration error
       alert(
         error.response?.data?.message || error.message || "Error en el registro"
       );
