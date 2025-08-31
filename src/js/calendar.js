@@ -62,8 +62,9 @@ async function loadCitas(citas) {
     content.innerHTML += renderCita(cita);
   });
 }
-
 function renderCita(cita) {
+  const dateHour = new Date(cita.appointment_date);
+
   const nombre = cita.patiens.users.fullname;
   const fechaNacimiento = cita.patiens.users.birthdate;
 
@@ -96,14 +97,18 @@ function renderCita(cita) {
               <p class="text-sm text-gray-600 mt-1">Paciente: ${nombre}</p>
               <p class="text-sm text-gray-600">Edad: ${calcularEdad(fechaNacimiento)} años</p>
             </div>
-            <span class="text-sm font-medium text-gray-700">${fechaHora}</span>
+
+            <div class="text-sm font-medium text-gray-700 flex flex-col">
+              <span>${convertDate(cita.appointment_date)}</span>
+              <span>Hora:${convertTime(dateHour)}</span>
+            </div>
+
           </div>
         </div>
       </div>
     </div>
   `;
 }
-
 
 function calcularEdad(fechaNacimiento) {
   const hoy = new Date();

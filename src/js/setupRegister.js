@@ -11,9 +11,7 @@ export async function setupRegister() {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     try {
-      // -----------------------------
-      // ORIGINAL LOGIC
-      // -----------------------------
+    
       const fullname = document.getElementById("fullname").value;
       const email = document.getElementById("email").value;
       const identification = document.getElementById("identification").value;
@@ -26,7 +24,7 @@ export async function setupRegister() {
       const confirm = document.getElementById("confirm-password").value;
 
       if (password !== confirm) {
-        return alert("No coinciden las contraseñas");
+        return alert("The passwords do not match.");
       }
 
       const newuser = {
@@ -42,22 +40,21 @@ export async function setupRegister() {
 
       // Register user
       const resp = await registerPost(newuser);
+      
+      // validation for change from role of user to patients
+      //(CREATE PACIENT)
 
-      // -----------------------------
-      // NEW LOGIC (CREATE PACIENT)
+      const user = resp.data.user;
 
-      //const user = resp.data.user;
+      if (user && user.role === 3) {
+        await axios.post(API_PATIENTS, { user_id: user.id });
+      }
 
-      //if (user && user.role === 3) {
-      //  await axios.post(API_PATIENTS, { user_id: user.id });
-      //}
-      // -----------------------------
-
-      alert("Registro exitoso, por favor inicia sesión.");
+      alert("Successful registration, please log in.");
       window.location.href = "/";
     } catch (error) {
       alert(
-        error.response?.data?.message || error.message || "Error en el registro"
+        error.response?.data?.message || error.message || "Error in the registration"
       );
     }
   });

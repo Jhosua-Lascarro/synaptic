@@ -3,7 +3,7 @@ import axios from 'axios';
 export async function setupDashboard() {
     axios.defaults.baseURL = 'http://localhost:3000';
 
-    // --- Estado global ---
+    // --- Estatus global ---
     let currentUser = null;
     let currentUserId = null;
     let currentPatientId = null;
@@ -18,7 +18,7 @@ export async function setupDashboard() {
 
     const statusMap = { 1: 'Confirmada', 2: 'Cancelada' };
 
-    // --- Elementos del DOM ---
+    // --- DOM elements ---
     const userNameElement = document.getElementById('user-name');
     const userEmailElement = document.getElementById('user-email');
     const userPhoneElement = document.getElementById('user-phone');
@@ -33,13 +33,13 @@ export async function setupDashboard() {
     const appointmentsListTitle = document.getElementById('appointments-list-title');
     const createAppointmentButton = document.getElementById('create-appointment-button');
 
-    // 🔹 Modal
+    //  Modal
     const appointmentModal = document.getElementById('appointment-modal');
     const appointmentForm = document.getElementById('appointment-form');
     const doctorSelect = document.getElementById('doctor-select');
     const closeModalBtn = document.getElementById('close-modal-btn');
 
-    // --- Utilidades ---
+    // --- utilies ---
     function formatDate(date) {
         const d = new Date(date);
         const year = d.getFullYear();
@@ -303,7 +303,7 @@ export async function setupDashboard() {
 
     await updateCalendarAndAppointments();
 
-    // --- Eventos ---
+    // --- Events ---
     logoutButton.addEventListener('click', logout);
     prevMonthBtn.addEventListener('click', () => {
         currentMonth--;
