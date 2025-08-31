@@ -109,6 +109,14 @@ function renderCita(cita) {
     </div>
   `;
 }
+function convertTime(dateHour) {
+  const hour = new Date(dateHour);
+  return hour.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  
+  });
+}
 
 function calcularEdad(fechaNacimiento) {
   const hoy = new Date();
