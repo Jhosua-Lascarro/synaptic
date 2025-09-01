@@ -22,4 +22,16 @@ export default defineConfig({
 		port: 5173,
 		open: true,
 	},
+
+	// Build configuration
+	build: {
+		outDir: path.resolve(__dirname, "dist"),
+		emptyOutDir: true,
+		sourcemap: false,
+		rollupOptions: {
+			input: {
+				main: path.resolve(__dirname, "src/index.html"),
+			},
+		},
+	},
 });
