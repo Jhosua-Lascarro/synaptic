@@ -7,6 +7,12 @@ const API_PATIENTS = "http://localhost:3000/patiens";
 export async function setupRegister() {
   const form = document.getElementById("form");
 
+  // Check if form exists before adding event listener
+  if (!form) {
+    console.error("Register form not found");
+    return;
+  }
+
   // Add submit event listener to the register form
   form.addEventListener("submit", async (e) => {
     e.preventDefault();

@@ -4,6 +4,13 @@ import { redirecto } from "../../router";
 // Function to setup login event listener
 export async function setupLogin() {
   const loginForm = document.getElementById("loginForm");
+  
+  // Check if loginForm exists before adding event listener
+  if (!loginForm) {
+    console.error("Login form not found");
+    return;
+  }
+  
   // Add submit event listener to the login form
   loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
