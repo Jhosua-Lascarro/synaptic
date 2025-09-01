@@ -1,5 +1,5 @@
 import axios from "axios";
-import { redirecto } from "../../router";
+import { redirecto } from "../router";
 
 // Function to setup login event listener
 export async function setupLogin() {

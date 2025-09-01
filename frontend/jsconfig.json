@@ -7,6 +7,6 @@
 		"module": "esnext",
 		"target": "esnext",
 	},
-	"include": ["src", "router.js"],
+	"include": ["src", "frontend/src/router.js", "backend/db"],
 	"exclude": ["node_modules", "dist"]
 }
