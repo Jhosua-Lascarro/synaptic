@@ -1,4 +1,4 @@
-import { redirecto } from "../../router";
+import { redirecto } from "../router";
 import { renderCalendarWidget } from "./calendar";
 
 // Function to setup the doctor's dashboard

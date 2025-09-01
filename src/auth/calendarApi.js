@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000/appointments/";
+const API_URL = "https://synaptic-fao4.onrender.com/appointments/";
 
 export async function getDateAppointmetns(fechaSeleccionada) {
   const resp = await fetch(`${API_URL}fecha?date=${fechaSeleccionada} `);

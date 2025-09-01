@@ -150,7 +150,7 @@ SUPABASE_PORT="4321"
 
 ## API Endpoins Documentation
 
-All API requests use the base URL: `(http://localhost:3000)`
+All API requests use the base URL: `(https://synaptic-fao4.onrender.com)`
 
 ## Answer main postman
 

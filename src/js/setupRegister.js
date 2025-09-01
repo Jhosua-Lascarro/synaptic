@@ -1,7 +1,7 @@
 import { registerPost } from "@/auth/registerApi";
 import axios from "axios";
 
-const API_PATIENTS = "http://localhost:3000/patiens";
+const API_PATIENTS = "https://synaptic-fao4.onrender.com/patiens";
 
 // Function to setup register event listener
 export async function setupRegister() {
