@@ -1,7 +1,7 @@
 {
   "name": "synaptic",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Modern webapp with Vite y TailwindCSS.",
   "license": "MIT",
   "repository": {
@@ -29,6 +29,7 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
+
     "@fullcalendar/core": "^6.1.19",
     "@fullcalendar/daygrid": "^6.1.19",
     "@fullcalendar/interaction": "^6.1.19",

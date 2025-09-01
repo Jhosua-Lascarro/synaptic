@@ -12,7 +12,11 @@ This file contains a simple list of changes for **SynapTic**.
 * Configured Vitest for testing.
 * Added Biome for linting and formatting.
 
-## Related Docs
+## \[0.0.2] - 2025-08-24
+
+* Added packages: express, cors, and supabase.
+* Built the connection to Supabase.
+* Exposed endpoint.
 
 * [CONTRIBUTING.md](./CONTRIBUTING.md)
 * [ISSUES.md](../ISSUES.md)
