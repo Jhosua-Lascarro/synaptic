@@ -745,7 +745,7 @@ app.get("/appointments/fecha", async (req, res) => {
 });
 
 // GET doctors with fullname and specialties
-app.get("/doctors/summary", async (req, res) => {
+app.get("/doctors/summary", async (_req, res) => {
   try {
     const { data, error } = await supabase
       .from("doctors")
