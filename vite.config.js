@@ -5,7 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-	base: '/SynapTic/',
+	base: '/synaptic/',
 	plugins: [tailwindcss()],
 
 	build: {
