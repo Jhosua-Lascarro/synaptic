@@ -17,6 +17,7 @@
     "build": "vite build",
     "start": "concurrently \"node src/db/endpoints_conection.js\" \"vite\"",
     "preview": "vite build && vite preview",
+    "back": "node src/db/endpoints_conection.js",
     "format": "biome format .",
     "lint": "biome lint .",
     "check": "biome check .",

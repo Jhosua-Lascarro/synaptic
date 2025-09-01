@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export async function setupDashboard() {
-    axios.defaults.baseURL = 'http://localhost:3000';
+    axios.defaults.baseURL = 'https://synaptic-fao4.onrender.com';
 
     // --- Estatus global ---
     let currentUser = null;
