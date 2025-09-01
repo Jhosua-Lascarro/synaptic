@@ -8,6 +8,9 @@ export default defineConfig({
 	base: 'SynapTic',
 	plugins: [tailwindcss()],
 
+	build: {
+    	outDir: '../dist',
+  	},
 	// Root directory
 	root: path.resolve(__dirname, "src"),
 
