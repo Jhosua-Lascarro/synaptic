@@ -5,14 +5,13 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
+	 base: '/synaptic/',
 	plugins: [tailwindcss()],
 
 	build: {
     	outDir: '../dist',
-		    emptyOutDir: true
+		emptyOutDir: true
   	},
-	// Root directory
-	root: path.resolve(__dirname, "src"),
 
 	// Alias configuration
 	resolve: {

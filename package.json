@@ -22,8 +22,7 @@
     "lint": "biome lint .",
     "check": "biome check .",
     "test": "vitest",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "vite build && gh-pages -d dist"
   },
   "devDependencies": {
     "@biomejs/biome": "2.0.6",
