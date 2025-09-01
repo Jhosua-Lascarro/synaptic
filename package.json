@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "Modern webapp with Vite y TailwindCSS.",
   "license": "MIT",
+  "homepage": "https://jhosua-lascarro.github.io/SynapTic/",
   "repository": {
     "type": "git",
     "url": "https://github.com/Jhosua-Lascarro/SynapTic"
