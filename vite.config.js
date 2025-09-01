@@ -10,6 +10,7 @@ export default defineConfig({
 
 	build: {
     	outDir: '../dist',
+		    emptyOutDir: true
   	},
 	// Root directory
 	root: path.resolve(__dirname, "src"),
