@@ -1,7 +1,7 @@
-import { setupDashboard } from "@/js/setupDashboard";
-import { setupDashboardDoctor } from "@/js/setupDashboardDoctor";
-import { setupLogin } from "@/js/setupLogin";
-import { setupRegister } from "@/js/setupRegister";
+import { setupDashboard } from "./src/js/setupDashboard";
+import { setupDashboardDoctor } from "./src/js/setupDashboardDoctor";
+import { setupLogin } from "./src/js/setupLogin";
+import { setupRegister } from "./src/js/setupRegister";
 
 const routes = {
   "/": {

@@ -1,4 +1,4 @@
-import { registerPost } from "@/auth/registerApi";
+import { registerPost } from "../auth/registerApi";
 import axios from "axios";
 
 const API_PATIENTS = "http://localhost:3000/patiens";

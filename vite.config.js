@@ -1,28 +1,23 @@
-// vite.config.js
-
-import path from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
-	 base: '/synaptic/',
-	plugins: [tailwindcss()],
-
-	build: {
-    	outDir: '../dist',
-		emptyOutDir: true
-  	},
-
-	// Alias configuration
-	resolve: {
-		alias: {
-			"@": path.resolve(__dirname, "src"),
-		},
-	},
-
-	// Server configuration
-	server: {
-		port: 5173,
-		open: true,
-	},
+  base: '/synaptic/',
+  plugins: [
+    tailwindcss(),
+    viteStaticCopy({
+      targets: [
+        { src: 'src/views/*.html', dest: '' }
+      ]
+    })
+  ],
+  build: {
+    outDir: './dist',
+    emptyOutDir: true
+  },
+  server: {
+    port: 5173,
+    open: true
+  }
 });

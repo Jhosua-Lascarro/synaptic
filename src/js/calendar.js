@@ -3,7 +3,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import esLocale from "@fullcalendar/core/locales/es";
 import interactionPlugin from "@fullcalendar/interaction";
 import "./calendar.css";
-import { getDateAppointmetns } from "@/auth/calendarApi";
+import { getDateAppointmetns } from "../auth/calendarApi";
 
 export function renderCalendarWidget() {
   const calendarEl = document.getElementById("calendar");
@@ -54,7 +54,7 @@ async function loadCitas(citas) {
   }
 
   if (!citas || citas.length === 0) {
-    content.innerHTML = `<p>No hay citas para esta fecha.</p>`;
+    content.innerHTML = "<p>No hay citas para esta fecha.</p>";
     return;
   }
 
@@ -75,7 +75,7 @@ function renderCita(cita) {
   const fechaObj = new Date(fechaIso);
 
   // --- Formatear fecha y hora (ej: 31 de agosto de 2025, 14:27) ---
-  const fechaHora = !isNaN(fechaObj.getTime())
+  const fechaHora = !Number.isNaN(fechaObj.getTime())
     ? fechaObj.toLocaleString("es-ES", {
         year: "numeric",
         month: "long",

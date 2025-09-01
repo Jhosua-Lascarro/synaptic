@@ -269,7 +269,7 @@ export async function setupDashboard() {
         document.querySelectorAll(".status-select").forEach(select => {
             select.addEventListener("change", (e) => {
                 const appointmentId = e.target.dataset.id;
-                const newStatus = parseInt(e.target.value);
+                const newStatus = Number.parseInt(e.target.value);
                 updateAppointmentStatus(appointmentId, newStatus);
             });
         });
