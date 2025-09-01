@@ -2,26 +2,27 @@ import { setupDashboard } from "@/js/setupDashboard";
 import { setupDashboardDoctor } from "@/js/setupDashboardDoctor";
 import { setupLogin } from "@/js/setupLogin";
 import { setupRegister } from "@/js/setupRegister";
+import { templates } from "@/views/templates";
 
 const routes = {
   "/": {
-    path: "/views/login.html",
+    template: "login",
     setup: setupLogin,
   },
   "/register": {
-    path: "/views/register.html",
+    template: "register",
     setup: setupRegister,
   },
   "/dashboard": {
-    path: "/views/dashboard.html",
+    template: "dashboard",
     setup: setupDashboard,
   },
   "/dashboardDoctor": {
-    path: "/views/dashboardDoctor.html",
+    template: "dashboardDoctor",
     setup: setupDashboardDoctor,
   },
   "/notfound": {
-    path: "/views/404.html",
+    template: "notfound",
   },
 };
 
@@ -68,13 +69,26 @@ export async function renderRouter() {
     }
 
     // Load and render the page content
-    const file = await fetch(route.path);
-    const content = await file.text();
+    console.log(`Loading route: ${path}`);
+    
+    // Get template from templates object instead of fetching files
+    const templateName = route.template;
+    if (!templates[templateName]) {
+      console.error(`Template ${templateName} not found`);
+      throw new Error(`Template ${templateName} not found`);
+    }
+    
+    const content = templates[templateName];
     app.innerHTML = content;
+    console.log(`Content loaded for ${templateName} template`);
 
     // Execute route-specific setup function if available
     if (route.setup) {
-      route.setup();
+      // Wait for the DOM to be updated before running setup
+      setTimeout(() => {
+        console.log(`Executing setup for ${templateName}`);
+        route.setup();
+      }, 0);
     }
   } catch (error) {
     console.error("Error loading page:", error);

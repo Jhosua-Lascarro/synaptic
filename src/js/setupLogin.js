@@ -1,8 +1,11 @@
 import axios from "axios";
-import { redirecto } from "../../router";
+import { redirecto } from "../router";
 
 // Function to setup login event listener
 export async function setupLogin() {
+  // Add a small delay to ensure DOM is fully rendered
+  await new Promise(resolve => setTimeout(resolve, 10));
+  
   const loginForm = document.getElementById("loginForm");
   
   // Check if loginForm exists before adding event listener
