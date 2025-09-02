@@ -28,8 +28,17 @@ const routes = {
 
 // get role from local storage
 function getUserRole() {
-  const user = JSON.parse(localStorage.getItem("current"));
-  return user ? user.role : null;
+  try {
+    const userData = localStorage.getItem("current");
+    if (!userData) return null;
+    const user = JSON.parse(userData);
+    return user ? user.role : null;
+  } catch (error) {
+    console.error("Error parsing user data from localStorage:", error);
+    // Clear corrupted data
+    localStorage.removeItem("current");
+    return null;
+  }
 }
 
 // protect routes based on role
@@ -43,7 +52,15 @@ function isRouteAllowed(path, role = null) {
 export async function renderRouter() {
   const app = document.getElementById("app");
   const path = window.location.pathname;
-  const route = routes[path] || routes["/notfound"];
+  
+  // Check if route exists, if not redirect to 404
+  const route = routes[path];
+  if (!route) {
+    console.log(`Route ${path} not found, redirecting to 404`);
+    window.history.replaceState({}, "", "/notfound");
+    return renderRouter();
+  }
+  
   const userRole = getUserRole();
   const isAuthPage = path === "/" || path === "/register";
   const isDashboardPage = path === "/dashboard" || path === "/dashboardDoctor";
@@ -71,11 +88,13 @@ export async function renderRouter() {
     // Load and render the page content
     console.log(`Loading route: ${path}`);
     
-    // Get template from templates object instead of fetching files
+    // Get template from templates object
     const templateName = route.template;
     if (!templates[templateName]) {
       console.error(`Template ${templateName} not found`);
-      throw new Error(`Template ${templateName} not found`);
+      // Fallback to 404 if template doesn't exist
+      window.history.replaceState({}, "", "/notfound");
+      return renderRouter();
     }
     
     const content = templates[templateName];

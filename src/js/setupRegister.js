@@ -1,11 +1,15 @@
 import { registerPost } from "@/auth/registerApi";
+import { redirecto } from "../router";
 import axios from "axios";
 
 const API_PATIENTS = "https://synaptic-fao4.onrender.com/patiens";
 
 // Function to setup register event listener
 export async function setupRegister() {
-  const form = document.getElementById("form");
+  // Add a small delay to ensure DOM is fully rendered
+  await new Promise(resolve => setTimeout(resolve, 10));
+  
+  const form = document.getElementById("registerForm");
 
   // Check if form exists before adding event listener
   if (!form) {
@@ -17,31 +21,21 @@ export async function setupRegister() {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     try {
-    
-      const fullname = document.getElementById("fullname").value;
+      const name = document.getElementById("name").value;
       const email = document.getElementById("email").value;
-      const identification = document.getElementById("identification").value;
-      const phone = document.getElementById("phone").value;
-      const birthdate = document.getElementById("birthdate").value;
-      const gender = document.querySelector(
-        'input[name="gender"]:checked'
-      )?.value;
       const password = document.getElementById("password").value;
-      const confirm = document.getElementById("confirm-password").value;
+      const role = Number.parseInt(document.getElementById("role").value);
 
-      if (password !== confirm) {
-        return alert("The passwords do not match.");
+      if (!name || !email || !password || !role) {
+        alert("Please fill in all fields.");
+        return;
       }
 
       const newuser = {
-        fullname,
+        fullname: name,
         emailInput: email,
-        identification,
-        phone,
-        birthdate,
-        sexo: gender,
         password_hash: password,
-        role: 3,
+        role: role,
       };
 
       // Register user
@@ -49,7 +43,6 @@ export async function setupRegister() {
       
       // validation for change from role of user to patients
       //(CREATE PACIENT)
-
       const user = resp.data.user;
 
       if (user && user.role === 3) {
@@ -57,8 +50,9 @@ export async function setupRegister() {
       }
 
       alert("Successful registration, please log in.");
-      window.location.href = "/";
+      redirecto("/");
     } catch (error) {
+      console.error("Registration error:", error);
       alert(
         error.response?.data?.message || error.message || "Error in the registration"
       );

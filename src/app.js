@@ -10,9 +10,9 @@ window.addEventListener('popstate', renderRouter)
 // Intercept link clicks to use router instead of full page navigation
 document.addEventListener('click', (event) => {
   const link = event.target.closest('a[href]')
-  if (link && link.href.startsWith(window.location.origin)) {
+  if (link?.href?.startsWith(window.location.origin)) {
     event.preventDefault()
-    const path = link.pathname
+    const path = new URL(link.href).pathname
     window.history.pushState({}, '', path)
     renderRouter()
   }

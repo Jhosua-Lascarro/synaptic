@@ -5,7 +5,20 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-	plugins: [tailwindcss()],
+	plugins: [
+		tailwindcss(),
+		// Plugin to copy _redirects file
+		{
+			name: 'copy-redirects',
+			generateBundle() {
+				this.emitFile({
+					type: 'asset',
+					fileName: '_redirects',
+					source: '/*    /index.html   200'
+				});
+			}
+		}
+	],
 
 	// Root directory
 	root: path.resolve(__dirname, "src"),
@@ -33,5 +46,8 @@ export default defineConfig({
 				main: path.resolve(__dirname, "src/index.html"),
 			},
 		},
+		// Copy _redirects file for Netlify compatibility
+		copyPublicDir: false,
+		assetsInclude: ['**/_redirects']
 	},
 });
