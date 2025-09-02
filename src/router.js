@@ -96,6 +96,6 @@ export async function renderRouter() {
 }
 
 export function redirecto(path) {
-  window.history.replaceState({}, "", `${path}`);
+  window.history.pushState({}, "", `${path}`);
   return renderRouter();
 }
