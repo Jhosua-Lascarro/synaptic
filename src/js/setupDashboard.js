@@ -292,8 +292,14 @@ export async function setupDashboard() {
     // --- Inicialización ---
     const currentStorage = localStorage.getItem('current');
     if (currentStorage) {
-        currentUser = JSON.parse(currentStorage);
-        currentUserId = currentUser.id;
+        try {
+            currentUser = JSON.parse(currentStorage);
+            currentUserId = currentUser.id;
+        } catch (error) {
+            console.error("Error parsing user data from localStorage:", error);
+            localStorage.removeItem('current');
+            return;
+        }
     }
     if (!currentUser || !currentUserId) return;
 

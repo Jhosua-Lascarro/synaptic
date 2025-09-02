@@ -43,11 +43,14 @@ export async function setupLogin() {
       } else if(user.role === 3) {
         redirecto("/dashboard")
       } else {
-        redirecto("/404")
+        redirecto("/notfound")
       }
 
     } catch (err) {
       console.error("Error en login", err);
+      // Show user-friendly error message
+      const errorMessage = err.response?.data?.message || err.message || "Login failed. Please check your credentials.";
+      alert(errorMessage);
     }
   });
 }
