@@ -33,16 +33,16 @@ export async function setupLogin() {
         password,
       });
       // Get user data from response
-      const user =await res.data.users
+      const user = await res.data.users
       // Save user data to localStorage
       localStorage.setItem("current", JSON.stringify(user))
       // Redirect based on user role
-      if (user.role===2) {
+      if (user.role === 2) {
         redirecto("/dashboardDoctor")
         
-      }else if(user.role===3){
+      } else if(user.role === 3) {
         redirecto("/dashboard")
-      }else{
+      } else {
         redirecto("/404")
       }
 
