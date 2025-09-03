@@ -1,5 +1,6 @@
 import axios from "axios";
 import { redirecto } from "../router";
+const API_URL = import.meta.env.VITE_API_URL
 
 // Function to setup login event listener
 export async function setupLogin() {
@@ -18,7 +19,7 @@ export async function setupLogin() {
     }
     try {
       // Send POST request to login endpoint
-      const res = await axios.post("http://localhost:3000/login", {
+      const res = await axios.post(`${API_URL}/login`, {
         email,
         password,
       });

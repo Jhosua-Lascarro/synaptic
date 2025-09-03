@@ -1,10 +1,10 @@
 import axios from "axios";
+const API_URL = import.meta.env.VITE_API_URL
 
-const API_URL = "http://localhost:3000/users";
 
 export async function registerPost(newUser) {
     try {
-        const resp = await axios.post(`${API_URL}`,newUser); 
+        const resp = await axios.post(`${API_URL}/users`,newUser); 
         return resp
     } catch (error) {
         
