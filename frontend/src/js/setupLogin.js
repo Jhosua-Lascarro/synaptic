@@ -4,6 +4,11 @@ const API_URL = import.meta.env.VITE_API_URL
 
 // Function to setup login event listener
 export async function setupLogin() {
+     const redirectoForm = document.getElementById("form-register");
+redirectoForm-addEventListener("click",()=> {
+  redirecto("/register")
+  
+})
   const loginForm = document.getElementById("loginForm");
   // Add submit event listener to the login form
   loginForm.addEventListener("submit", async (event) => {
@@ -34,7 +39,7 @@ export async function setupLogin() {
       }else if(user.role===3){
         redirecto("/dashboard")
       }else{
-        redirecto("/404")
+        redirecto("/notfound")
       }
 
     } catch (err) {
