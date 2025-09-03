@@ -8,6 +8,12 @@ export default defineConfig({
 	// Root directory
 	root: path.resolve(__dirname, "src"),
 
+	// Build configuration
+	build: {
+		outDir: path.resolve(__dirname, "dist"), // ⬅️ Render usará esta carpeta
+		emptyOutDir: true,
+	},
+
 	// Alias configuration
 	resolve: {
 		alias: {
