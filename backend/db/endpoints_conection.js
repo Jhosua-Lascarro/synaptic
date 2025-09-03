@@ -794,10 +794,15 @@ app.get("/doctors/summary", async (req, res) => {
     return res.status(500).json({ error: "Unexpected error" });
   }
 });
-
+app.get("/", (req, res) => {
+  res.json({ message: "Servidor preparado" });
+});
 
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
+
+ 
   console.log("Servidor arriba en puerto http://localhost:3000");
+
 });
