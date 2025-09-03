@@ -8,4 +8,3 @@ export const supabaseData = {
 };
 
 export const supabase = createClient(supabaseData.url, supabaseData.key);
-
