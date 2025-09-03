@@ -10,7 +10,7 @@ export default defineConfig({
 
 	// Build configuration
 	build: {
-		outDir: path.resolve(__dirname, "dist"), // ⬅️ Render usará esta carpeta
+		outDir: path.resolve(__dirname, "src/dist"), // ⬅️ ahora el dist queda dentro de src
 		emptyOutDir: true,
 	},
 
