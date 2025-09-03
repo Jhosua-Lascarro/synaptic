@@ -9,6 +9,7 @@ export default defineConfig({
 	root: path.resolve(__dirname, "src"),
 
 	// Build configuration
+	/* crear la ruta de dist */
 	build: {
 		outDir: path.resolve(__dirname, "src/dist"), // ⬅️ ahora el dist queda dentro de src
 		emptyOutDir: true,
