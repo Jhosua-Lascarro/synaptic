@@ -17,7 +17,7 @@ export async function setupLogin() {
     
     
   })
-  console.log("NO ME SALE ");
+  console.log("NO ME SALE");
   
     
   }
