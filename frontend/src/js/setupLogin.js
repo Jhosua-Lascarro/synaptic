@@ -4,6 +4,12 @@ const API_URL = import.meta.env.VITE_API_URL
 
 // Function to setup login event listener
 export async function setupLogin() {
+  const formregister=document.getElementById("form-register")
+  console.log(formregister);
+  formregister.addEventListener("click",()=>{
+     redirecto("/register")
+  })
+  
  
   const loginForm = document.getElementById("loginForm");
   // Add submit event listener to the login form
