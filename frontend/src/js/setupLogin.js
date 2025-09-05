@@ -7,7 +7,11 @@ export async function setupLogin() {
   const formregister=document.getElementById("form-register")
   console.log(formregister);
   formregister.addEventListener("click",()=>{
-     redirecto("/register")
+    if (formregister) {
+       redirecto("/register")
+      
+    }
+    
   })
   
  
